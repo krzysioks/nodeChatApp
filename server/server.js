@@ -21,6 +21,33 @@ app.use(express.static(publicPath));
 //registering an io event
 io.on('connection', socket => {
     console.log('New user connected');
+
+    //emitting new chat message
+    socket.emit('newMessage', {
+        from: 'Janet',
+        text: 'Chat msg',
+        createdAt: new Date().getTime()
+    });
+    //emiting new event by server
+    // socket.emit('newEmail', {
+    //     from: 'Mike@test.com',
+    //     text: 'Test msg.',
+    //     createdAt: new Date().getTime()
+    // });
+
+    // socket.on('createEmail', ({ to, title, body }) => {
+    //     console.log('createEmail', to, title, body);
+    // });
+
+    socket.on('createMessage', ({ from, text }) => {
+        console.log(`createMessage from: ${from} with text: ${text}`);
+        socket.emit('newMessage', {
+            from,
+            text,
+            createdAt: new Date().getTime()
+        });
+    });
+
     socket.on('disconnecting', socket => {
         console.log('User disconnected');
     });
