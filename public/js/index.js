@@ -8,11 +8,10 @@ socket.on('connect', function() {
     //     body: 'We successfully emitted createEmail event.'
     // });
 
-    //
-    socket.emit('createMessage', {
-        from: 'Krzysiek',
-        text: 'This is create message text'
-    });
+    // socket.emit('createMessage', {
+    //     from: 'Krzysiek',
+    //     text: 'This is create message text'
+    // });
 });
 
 socket.on('disconnect', function() {

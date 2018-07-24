@@ -22,12 +22,16 @@ app.use(express.static(publicPath));
 io.on('connection', socket => {
     console.log('New user connected');
 
+    //IMPORTANT
+    //socket.emit - emitss to single connection (single connected user)
+    //io.emit - emitts to all user connected
+
     //emitting new chat message
-    socket.emit('newMessage', {
-        from: 'Janet',
-        text: 'Chat msg',
-        createdAt: new Date().getTime()
-    });
+    // socket.emit('newMessage', {
+    //     from: 'Janet',
+    //     text: 'Chat msg',
+    //     createdAt: new Date().getTime()
+    // });
     //emiting new event by server
     // socket.emit('newEmail', {
     //     from: 'Mike@test.com',
@@ -41,7 +45,7 @@ io.on('connection', socket => {
 
     socket.on('createMessage', ({ from, text }) => {
         console.log(`createMessage from: ${from} with text: ${text}`);
-        socket.emit('newMessage', {
+        io.emit('newMessage', {
             from,
             text,
             createdAt: new Date().getTime()
