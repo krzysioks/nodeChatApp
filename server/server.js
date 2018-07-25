@@ -1,14 +1,16 @@
 require('./config/config');
 const path = require('path');
 const http = require('http');
+const bodyParser = require('body-parser');
 const express = require('express');
 const socketIO = require('socket.io');
 const { generateMessage } = require('./utils/message');
 
-const publicPath = path.join(__dirname, '../public');
+//const publicPath = path.join(__dirname, '../public');
+const publicPath = path.join(__dirname, '../dist');
 
-console.log(`${__dirname}/../public`);
-console.log(publicPath);
+// console.log(`${__dirname}/../public`);
+// console.log(publicPath);
 
 const app = express();
 const server = http.createServer(app);
@@ -17,6 +19,8 @@ const server = http.createServer(app);
 const io = socketIO(server);
 
 //used middleware to serve frontend public html
+//app.use(express.static(publicPath));
+//app.use(bodyParser.json());
 app.use(express.static(publicPath));
 
 //registering an io event
@@ -49,7 +53,7 @@ io.on('connection', socket => {
     //     console.log('createEmail', to, title, body);
     // });
 
-    socket.on('createMessage', ({ from, text }) => {
+    socket.on('createMessage', ({ from, text }, callback) => {
         console.log(`createMessage from: ${from} with text: ${text}`);
 
         //emits event to all connected useres except myself
@@ -59,6 +63,7 @@ io.on('connection', socket => {
         //     createdAt: new Date().getTime()
         // });
         io.emit('newMessage', generateMessage(from, text));
+        callback('All Ok');
     });
 
     socket.on('disconnecting', socket => {

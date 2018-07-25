@@ -26,3 +26,7 @@ socket.on('disconnect', function() {
 socket.on('newMessage', function(msg) {
     console.log('New msg received', msg);
 });
+
+socket.emit('createMessage', { from: 'Admin', text: 'hello new ones' }, function(response) {
+    console.log(response);
+});
