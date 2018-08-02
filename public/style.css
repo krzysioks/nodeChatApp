@@ -1,0 +1,20 @@
+.displayFlex {
+    display: flex;
+    flex-direction: column;
+}
+
+.flexStart {
+    justify-content: flex-start;
+}
+
+.flexRow {
+    flex-direction: row;
+}
+
+.messageBox {
+    width: 280px;
+}
+
+.messageLabel {
+    margin-right: 10px !important;
+}
