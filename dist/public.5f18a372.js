@@ -14330,9 +14330,21 @@ var MessageViewer = function (_Component) {
                     null,
                     messageList.map(function (_ref2, idx) {
                         var from = _ref2.from,
-                            text = _ref2.text;
+                            text = _ref2.text,
+                            lat = _ref2.lat,
+                            long = _ref2.long;
 
-                        return (0, _preact.h)(
+                        return lat && long ? (0, _preact.h)(
+                            'li',
+                            { key: idx },
+                            from + ': ',
+                            ' ',
+                            (0, _preact.h)(
+                                'a',
+                                { target: '_blank', href: 'https://www.google.com/maps?q=' + lat + ',' + long },
+                                'location'
+                            )
+                        ) : (0, _preact.h)(
                             'li',
                             { key: idx },
                             from + ': ' + text
@@ -14413,10 +14425,12 @@ var Index = function (_Component) {
 
         _this.onClickEvent = _this.onClickEvent.bind(_this);
         _this.onKeyUpEvent = _this.onKeyUpEvent.bind(_this);
+        _this.onClickLocationEvent = _this.onClickLocationEvent.bind(_this);
 
         _this.state = {
             textAreaValue: '',
-            messageList: [] //lsit of objects {from: <String>, text: <String>}
+            messageList: [], //lsit of objects {from: <String>, text: <String>}
+            geoMsg: ''
         };
         return _this;
     }
@@ -14455,14 +14469,10 @@ var Index = function (_Component) {
                     messageList: [].concat(_toConsumableArray(_this2.state.messageList), [msg])
                 });
             });
-
-            // this.io.emit('createMessage', { from: 'Admin', text: 'hello new ones' }, response => {
-            //     console.log(response);
-            // });
         }
     }, {
         key: 'onClickEvent',
-        value: function onClickEvent(evt) {
+        value: function onClickEvent() {
             var msg = { from: 'User', text: this.state.textAreaValue };
             //createMessage event triggeres newMessage event which is subscribed in componentWillMount
             this.io.emit('createMessage', msg, function (response) {
@@ -14470,10 +14480,27 @@ var Index = function (_Component) {
             });
         }
     }, {
+        key: 'onClickLocationEvent',
+        value: function onClickLocationEvent() {
+            var _this3 = this;
+
+            if (!navigator.geolocation) {
+                this.setState({ geoMsg: 'Geolocation not supported' });
+            }
+
+            navigator.geolocation.getCurrentPosition(function (position) {
+                _this3.io.emit('createLocationMessage', {
+                    lat: position.coords.latitude,
+                    long: position.coords.longitude
+                });
+            }, function () {
+                _this3.setState({ geoMsg: 'Unable to fetch location' });
+            });
+        }
+    }, {
         key: 'onKeyUpEvent',
         value: function onKeyUpEvent(evt) {
             this.setState({ textAreaValue: evt.target.value });
-            console.info('tx: ', this.state.textAreaValue);
         }
     }, {
         key: 'render',
@@ -14505,6 +14532,16 @@ var Index = function (_Component) {
                         _Button2.default,
                         { onClick: this.onClickEvent },
                         'Send'
+                    ),
+                    (0, _preact.h)(
+                        _Button2.default,
+                        { onClick: this.onClickLocationEvent },
+                        'Send Location'
+                    ),
+                    (0, _preact.h)(
+                        'div',
+                        { style: 'color: red; font-wight: bold;' },
+                        state.geoMsg
                     )
                 )
             );

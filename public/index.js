@@ -19,10 +19,12 @@ class Index extends Component {
 
         this.onClickEvent = this.onClickEvent.bind(this);
         this.onKeyUpEvent = this.onKeyUpEvent.bind(this);
+        this.onClickLocationEvent = this.onClickLocationEvent.bind(this);
 
         this.state = {
             textAreaValue: '',
-            messageList: [] //lsit of objects {from: <String>, text: <String>}
+            messageList: [], //lsit of objects {from: <String>, text: <String>}
+            geoMsg: ''
         };
     }
     componentWillMount() {
@@ -55,21 +57,33 @@ class Index extends Component {
                 messageList: [...this.state.messageList, msg]
             });
         });
-
-        // this.io.emit('createMessage', { from: 'Admin', text: 'hello new ones' }, response => {
-        //     console.log(response);
-        // });
     }
-    onClickEvent(evt) {
+    onClickEvent() {
         const msg = { from: 'User', text: this.state.textAreaValue };
         //createMessage event triggeres newMessage event which is subscribed in componentWillMount
         this.io.emit('createMessage', msg, response => {
             console.log(response);
         });
     }
+    onClickLocationEvent() {
+        if (!navigator.geolocation) {
+            this.setState({ geoMsg: 'Geolocation not supported' });
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                this.io.emit('createLocationMessage', {
+                    lat: position.coords.latitude,
+                    long: position.coords.longitude
+                });
+            },
+            () => {
+                this.setState({ geoMsg: 'Unable to fetch location' });
+            }
+        );
+    }
     onKeyUpEvent(evt) {
         this.setState({ textAreaValue: evt.target.value });
-        console.info('tx: ', this.state.textAreaValue);
     }
     render(props, state) {
         return (
@@ -89,6 +103,8 @@ class Index extends Component {
                 </FormField>
                 <FormField className="flexStart">
                     <Button onClick={this.onClickEvent}>Send</Button>
+                    <Button onClick={this.onClickLocationEvent}>Send Location</Button>
+                    <div style="color: red; font-wight: bold;">{state.geoMsg}</div>
                 </FormField>
             </div>
         );

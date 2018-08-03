@@ -4,7 +4,7 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const express = require('express');
 const socketIO = require('socket.io');
-const { generateMessage } = require('./utils/message');
+const { generateMessage, generateLocationMessage } = require('./utils/message');
 
 //const publicPath = path.join(__dirname, '../public');
 const publicPath = path.join(__dirname, '../dist');
@@ -64,6 +64,10 @@ io.on('connection', socket => {
         // });
         io.emit('newMessage', generateMessage(from, text));
         callback('All Ok');
+    });
+
+    socket.on('createLocationMessage', ({ lat, long }) => {
+        io.emit('newMessage', generateLocationMessage('Admin', lat, long));
     });
 
     socket.on('disconnecting', socket => {
