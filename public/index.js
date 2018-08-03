@@ -1,5 +1,6 @@
 import { h, render, Component } from 'preact';
 import socket from 'socket.io-client';
+import moment from 'moment';
 import TextField from 'preact-material-components/TextField';
 import 'preact-material-components/TextField/style.css';
 import FormField from 'preact-material-components/FormField';

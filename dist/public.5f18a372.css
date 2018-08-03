@@ -2014,6 +2014,7 @@ ol li {
     margin: 5px 0px 10px 10px;
     font-size: 22px;
     font-weight: bold;
+    color: #6200ee;
 }
 
 .chatComponentContainer {
@@ -2023,4 +2024,9 @@ ol li {
 .user {
     font-weight: bold;
     color: #6200ee;
+}
+
+.time {
+    font-size: 12px;
+    margin: 0px 0px 0px 5px;
 }
