@@ -1961,6 +1961,9 @@
 
 /*# sourceMappingURL=mdc.theme.css.map*/.displayFlex {
     display: flex;
+}
+
+.flexColumn {
     flex-direction: column;
 }
 
@@ -1973,9 +1976,51 @@
 }
 
 .messageBox {
-    width: 280px;
+    width: 300px;
 }
 
 .messageLabel {
     margin-right: 10px !important;
+}
+
+.messageView {
+    background-color: rgba(160, 160, 160, 0.5);
+    width: 300px;
+    height: 390px;
+    overflow-y: auto;
+}
+
+ol {
+    list-style-type: none;
+    padding: 0px 10px 0px 10px;
+}
+
+ol li {
+    padding: 5px;
+}
+.msgPlaceholder {
+    width: 300px;
+    height: 100px;
+}
+
+.sidebar {
+    background-color: rgba(160, 160, 160, 0.5);
+    width: 300px;
+    margin: 0px 30px 0px 10px;
+    overflow-y: auto;
+}
+
+.headline {
+    margin: 5px 0px 10px 10px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.chatComponentContainer {
+    height: 500px;
+}
+
+.user {
+    font-weight: bold;
+    color: #6200ee;
 }

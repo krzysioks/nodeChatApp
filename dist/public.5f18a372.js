@@ -14291,6 +14291,11 @@ exports.default = _default;
         module.hot.dispose(reloadCSS);
         module.hot.accept(reloadCSS);
       
+},{"_css_loader":"..\\node_modules\\parcel-bundler\\src\\builtins\\css-loader.js"}],"style.css":[function(require,module,exports) {
+
+var reloadCSS = require('_css_loader');
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
 },{"_css_loader":"..\\node_modules\\parcel-bundler\\src\\builtins\\css-loader.js"}],"components\\messageViewer.js":[function(require,module,exports) {
 'use strict';
 
@@ -14301,6 +14306,8 @@ Object.defineProperty(exports, "__esModule", {
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _preact = require('preact');
+
+require('./../style.css');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -14324,7 +14331,7 @@ var MessageViewer = function (_Component) {
 
             return (0, _preact.h)(
                 'div',
-                null,
+                { 'class': 'messageView' },
                 (0, _preact.h)(
                     'ol',
                     null,
@@ -14337,8 +14344,12 @@ var MessageViewer = function (_Component) {
                         return lat && long ? (0, _preact.h)(
                             'li',
                             { key: idx },
-                            from + ': ',
-                            ' ',
+                            (0, _preact.h)(
+                                'span',
+                                { 'class': 'user' },
+                                from + ': ',
+                                ' '
+                            ),
                             (0, _preact.h)(
                                 'a',
                                 { target: '_blank', href: 'https://www.google.com/maps?q=' + lat + ',' + long },
@@ -14347,7 +14358,12 @@ var MessageViewer = function (_Component) {
                         ) : (0, _preact.h)(
                             'li',
                             { key: idx },
-                            from + ': ' + text
+                            (0, _preact.h)(
+                                'span',
+                                { 'class': 'user' },
+                                from
+                            ),
+                            ': ' + text
                         );
                     })
                 )
@@ -14359,12 +14375,54 @@ var MessageViewer = function (_Component) {
 }(_preact.Component);
 
 exports.default = MessageViewer;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js"}],"style.css":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","./../style.css":"style.css"}],"components\\sidebar.js":[function(require,module,exports) {
+'use strict';
 
-var reloadCSS = require('_css_loader');
-module.hot.dispose(reloadCSS);
-module.hot.accept(reloadCSS);
-},{"_css_loader":"..\\node_modules\\parcel-bundler\\src\\builtins\\css-loader.js"}],"index.js":[function(require,module,exports) {
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+require('./../style.css');
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Sidebar = function (_Component) {
+    _inherits(Sidebar, _Component);
+
+    function Sidebar() {
+        _classCallCheck(this, Sidebar);
+
+        return _possibleConstructorReturn(this, (Sidebar.__proto__ || Object.getPrototypeOf(Sidebar)).call(this));
+    }
+
+    _createClass(Sidebar, [{
+        key: 'render',
+        value: function render() {
+            return (0, _preact.h)(
+                'div',
+                { 'class': 'sidebar' },
+                (0, _preact.h)(
+                    'div',
+                    { 'class': 'headline' },
+                    'people:'
+                )
+            );
+        }
+    }]);
+
+    return Sidebar;
+}(_preact.Component);
+
+exports.default = Sidebar;
+},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","./../style.css":"style.css"}],"index.js":[function(require,module,exports) {
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -14401,6 +14459,10 @@ var _messageViewer = require('./components/messageViewer');
 
 var _messageViewer2 = _interopRequireDefault(_messageViewer);
 
+var _sidebar = require('./components/sidebar');
+
+var _sidebar2 = _interopRequireDefault(_sidebar);
+
 require('./style.css');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -14430,7 +14492,8 @@ var Index = function (_Component) {
         _this.state = {
             textAreaValue: '',
             messageList: [], //lsit of objects {from: <String>, text: <String>}
-            geoMsg: ''
+            geoMsg: '',
+            isSendDisabled: true
         };
         return _this;
     }
@@ -14478,6 +14541,11 @@ var Index = function (_Component) {
             this.io.emit('createMessage', msg, function (response) {
                 console.log(response);
             });
+            this.setState({
+                textAreaValue: '',
+                isSendDisabled: true,
+                geoMsg: ''
+            });
         }
     }, {
         key: 'onClickLocationEvent',
@@ -14500,48 +14568,51 @@ var Index = function (_Component) {
     }, {
         key: 'onKeyUpEvent',
         value: function onKeyUpEvent(evt) {
-            this.setState({ textAreaValue: evt.target.value });
+            this.setState({ textAreaValue: evt.target.value, isSendDisabled: false });
         }
     }, {
         key: 'render',
         value: function render(props, state) {
             return (0, _preact.h)(
                 'div',
-                { 'class': 'displayFlex' },
-                (0, _preact.h)(_messageViewer2.default, { messageList: state.messageList }),
+                { 'class': 'displayFlex flexRow chatComponentContainer' },
+                (0, _preact.h)(_sidebar2.default, null),
                 (0, _preact.h)(
-                    _FormField2.default,
-                    { className: 'flexRow flexStart messageBox' },
+                    'div',
+                    { 'class': 'displayFlex flexColumn' },
+                    (0, _preact.h)(_messageViewer2.default, { messageList: state.messageList }),
                     (0, _preact.h)(
-                        'label',
-                        { 'class': 'messageLabel', 'for': 'textMsg' },
-                        'Message:'
-                    ),
-                    (0, _preact.h)(_TextField2.default, {
-                        onKeyUp: this.onKeyUpEvent,
-                        placeholder: 'type message',
-                        id: 'textMsg',
-                        textarea: true,
-                        style: { width: '200px', height: '100px' }
-                    })
-                ),
-                (0, _preact.h)(
-                    _FormField2.default,
-                    { className: 'flexStart' },
-                    (0, _preact.h)(
-                        _Button2.default,
-                        { onClick: this.onClickEvent },
-                        'Send'
+                        _FormField2.default,
+                        { className: 'flexRow flexStart messageBox' },
+                        (0, _preact.h)(_TextField2.default, {
+                            onKeyUp: this.onKeyUpEvent,
+                            placeholder: 'type message',
+                            id: 'textMsg',
+                            textarea: true,
+                            className: 'msgPlaceholder',
+                            value: state.textAreaValue,
+                            autofocus: true,
+                            autocomplete: 'off'
+                        })
                     ),
                     (0, _preact.h)(
-                        _Button2.default,
-                        { onClick: this.onClickLocationEvent },
-                        'Send Location'
-                    ),
-                    (0, _preact.h)(
-                        'div',
-                        { style: 'color: red; font-wight: bold;' },
-                        state.geoMsg
+                        _FormField2.default,
+                        { className: 'flexStart' },
+                        (0, _preact.h)(
+                            _Button2.default,
+                            { onClick: this.onClickEvent, disabled: state.isSendDisabled },
+                            'Send'
+                        ),
+                        (0, _preact.h)(
+                            _Button2.default,
+                            { onClick: this.onClickLocationEvent },
+                            'Send Location'
+                        ),
+                        (0, _preact.h)(
+                            'div',
+                            { style: 'color: red; font-wight: bold;' },
+                            state.geoMsg
+                        )
                     )
                 )
             );
@@ -14552,7 +14623,7 @@ var Index = function (_Component) {
 }(_preact.Component);
 
 (0, _preact.render)((0, _preact.h)(Index, null), document.body);
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","./components/messageViewer":"components\\messageViewer.js","./style.css":"style.css"}],"..\\node_modules\\parcel-bundler\\src\\builtins\\hmr-runtime.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","./components/messageViewer":"components\\messageViewer.js","./components/sidebar":"components\\sidebar.js","./style.css":"style.css"}],"..\\node_modules\\parcel-bundler\\src\\builtins\\hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 

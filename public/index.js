@@ -9,6 +9,7 @@ import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 import 'preact-material-components/Theme/style.css';
 import MessageViewer from './components/messageViewer';
+import Sidebar from './components/sidebar';
 
 import './style.css';
 
@@ -24,7 +25,8 @@ class Index extends Component {
         this.state = {
             textAreaValue: '',
             messageList: [], //lsit of objects {from: <String>, text: <String>}
-            geoMsg: ''
+            geoMsg: '',
+            isSendDisabled: true
         };
     }
     componentWillMount() {
@@ -64,6 +66,11 @@ class Index extends Component {
         this.io.emit('createMessage', msg, response => {
             console.log(response);
         });
+        this.setState({
+            textAreaValue: '',
+            isSendDisabled: true,
+            geoMsg: ''
+        });
     }
     onClickLocationEvent() {
         if (!navigator.geolocation) {
@@ -83,29 +90,34 @@ class Index extends Component {
         );
     }
     onKeyUpEvent(evt) {
-        this.setState({ textAreaValue: evt.target.value });
+        this.setState({ textAreaValue: evt.target.value, isSendDisabled: false });
     }
     render(props, state) {
         return (
-            <div class="displayFlex">
-                <MessageViewer messageList={state.messageList} />
-                <FormField className="flexRow flexStart messageBox">
-                    <label class="messageLabel" for="textMsg">
-                        Message:
-                    </label>
-                    <TextField
-                        onKeyUp={this.onKeyUpEvent}
-                        placeholder="type message"
-                        id="textMsg"
-                        textarea={true}
-                        style={{ width: '200px', height: '100px' }}
-                    />
-                </FormField>
-                <FormField className="flexStart">
-                    <Button onClick={this.onClickEvent}>Send</Button>
-                    <Button onClick={this.onClickLocationEvent}>Send Location</Button>
-                    <div style="color: red; font-wight: bold;">{state.geoMsg}</div>
-                </FormField>
+            <div class="displayFlex flexRow chatComponentContainer">
+                <Sidebar />
+                <div class="displayFlex flexColumn">
+                    <MessageViewer messageList={state.messageList} />
+                    <FormField className="flexRow flexStart messageBox">
+                        <TextField
+                            onKeyUp={this.onKeyUpEvent}
+                            placeholder="type message"
+                            id="textMsg"
+                            textarea={true}
+                            className="msgPlaceholder"
+                            value={state.textAreaValue}
+                            autofocus
+                            autocomplete="off"
+                        />
+                    </FormField>
+                    <FormField className="flexStart">
+                        <Button onClick={this.onClickEvent} disabled={state.isSendDisabled}>
+                            Send
+                        </Button>
+                        <Button onClick={this.onClickLocationEvent}>Send Location</Button>
+                        <div style="color: red; font-wight: bold;">{state.geoMsg}</div>
+                    </FormField>
+                </div>
             </div>
         );
     }
