@@ -20644,7 +20644,9 @@ var MessageViewer = function (_Component) {
     _createClass(MessageViewer, [{
         key: 'scrollToBottom',
         value: function scrollToBottom() {
-            if (this.base.clientHeight + this.base.scrollTop + this.lastMsgRef.getBoundingClientRect().height >= this.base.scrollHeight) {
+            var lastMsgHeight = this.lastMsgRef ? this.lastMsgRef.getBoundingClientRect().height : 0;
+
+            if (this.lastMsgRef && this.base.clientHeight + this.base.scrollTop + lastMsgHeight >= this.base.scrollHeight) {
                 this.lastMsgRef.scrollIntoView({ behavior: 'smooth' });
             }
         }
@@ -20758,7 +20760,9 @@ var Sidebar = function (_Component) {
 
     _createClass(Sidebar, [{
         key: 'render',
-        value: function render() {
+        value: function render(_ref, state) {
+            var users = _ref.users;
+
             return (0, _preact.h)(
                 'div',
                 { 'class': 'sidebar' },
@@ -20766,6 +20770,21 @@ var Sidebar = function (_Component) {
                     'div',
                     { 'class': 'headline' },
                     'people:'
+                ),
+                (0, _preact.h)(
+                    'ol',
+                    null,
+                    users.map(function (user, idx) {
+                        return (0, _preact.h)(
+                            'li',
+                            { key: idx },
+                            (0, _preact.h)(
+                                'span',
+                                { 'class': 'user' },
+                                user
+                            )
+                        );
+                    })
                 )
             );
         }
@@ -20789,6 +20808,8 @@ var _preact = require('preact');
 var _socket = require('socket.io-client');
 
 var _socket2 = _interopRequireDefault(_socket);
+
+var _preactRouter = require('preact-router');
 
 var _TextField = require('preact-material-components/TextField');
 
@@ -20850,7 +20871,8 @@ var Chat = function (_Component) {
             textAreaValue: '',
             messageList: [], //lsit of objects {from: <String>, text: <String>}
             geoMsg: '',
-            isSendDisabled: true
+            isSendDisabled: true,
+            users: []
         };
         return _this;
     }
@@ -20867,28 +20889,39 @@ var Chat = function (_Component) {
                 //     title: 'This is create email event',
                 //     body: 'We successfully emitted createEmail event.'
                 // });
-
-                // socket.emit('createMessage', {
-                //     from: 'Krzysiek',
-                //     text: 'This is create message text'
-                // });
             });
 
             this.io.on('disconnect', function () {
                 console.log('disconnected from server');
             });
 
+            this.io.on('updateUserList', function (users) {
+                _this2.setState({ users: users });
+            });
+
             //to catch socket.emit from server side, on client side use socket.on to register event with the same name as emited by server
             // socket.on('newEmail', function(email) {
             //     console.log('New email', email);
             // });
-
+            console.info('componentWillMount');
             this.io.on('newMessage', function (msg) {
                 console.log('New msg received', msg);
                 _this2.setState({
                     messageList: [].concat(_toConsumableArray(_this2.state.messageList), [msg])
                 });
             });
+        }
+    }, {
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var msg = {
+                from: 'Admin',
+                text: 'Welcome to chat app ' + this.props.userName
+            };
+            this.setState({
+                messageList: [].concat(_toConsumableArray(this.state.messageList), [msg])
+            });
+            this.io.emit('joinRoom', { userName: this.props.userName, roomName: this.props.roomName }, function () {});
         }
     }, {
         key: 'onClickEvent',
@@ -20930,11 +20963,10 @@ var Chat = function (_Component) {
     }, {
         key: 'render',
         value: function render(props, state) {
-            console.info('props: ', props);
             return (0, _preact.h)(
                 'div',
                 { 'class': 'displayFlex flexRow chatComponentContainer' },
-                (0, _preact.h)(_sidebar2.default, null),
+                (0, _preact.h)(_sidebar2.default, { users: state.users }),
                 (0, _preact.h)(
                     'div',
                     { 'class': 'displayFlex flexColumn' },
@@ -20981,7 +21013,7 @@ var Chat = function (_Component) {
 }(_preact.Component);
 
 exports.default = Chat;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","./components/messageViewer":"components\\messageViewer.js","./components/sidebar":"components\\sidebar.js","./style.css":"style.css"}],"login.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","./components/messageViewer":"components\\messageViewer.js","./components/sidebar":"components\\sidebar.js","./style.css":"style.css"}],"login.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20993,6 +21025,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _preact = require('preact');
 
 var _preactRouter = require('preact-router');
+
+var _socket = require('socket.io-client');
+
+var _socket2 = _interopRequireDefault(_socket);
 
 var _Button = require('preact-material-components/Button');
 
@@ -21036,12 +21072,14 @@ var Login = function (_Component) {
 
         var _this = _possibleConstructorReturn(this, (Login.__proto__ || Object.getPrototypeOf(Login)).call(this));
 
+        _this.io = (0, _socket2.default)();
         _this.onClickEvent = _this.onClickEvent.bind(_this);
         _this.onKeyUpEvent = _this.onKeyUpEvent.bind(_this);
         _this.state = {
             userName: '',
             roomName: '',
-            isJoinDisabled: true
+            isJoinDisabled: true,
+            msg: ''
         };
         return _this;
     }
@@ -21049,7 +21087,18 @@ var Login = function (_Component) {
     _createClass(Login, [{
         key: 'onClickEvent',
         value: function onClickEvent() {
-            (0, _preactRouter.route)('/chat/' + this.state.userName + '/' + this.state.roomName, false);
+            var _this2 = this;
+
+            this.io.emit('validateJoin', { userName: this.state.userName, roomName: this.state.roomName }, function (err) {
+                if (err) {
+                    _this2.setState({
+                        msg: 'Room and user names are required'
+                    });
+                    return;
+                }
+
+                (0, _preactRouter.route)('/chat/' + _this2.state.userName + '/' + _this2.state.roomName, false);
+            });
         }
     }, {
         key: 'onKeyUpEvent',
@@ -21067,6 +21116,11 @@ var Login = function (_Component) {
                 (0, _preact.h)(
                     'div',
                     { 'class': 'displayFlex flexColumn messageBox' },
+                    (0, _preact.h)(
+                        'div',
+                        { style: 'color: red; font-wight: bold;' },
+                        state.msg
+                    ),
                     (0, _preact.h)(
                         'span',
                         { 'class': 'headline' },
@@ -21096,7 +21150,7 @@ var Login = function (_Component) {
 }(_preact.Component);
 
 exports.default = Login;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","./style.css":"style.css"}],"index.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","./style.css":"style.css"}],"index.js":[function(require,module,exports) {
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -21179,7 +21233,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '52366' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '55636' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 

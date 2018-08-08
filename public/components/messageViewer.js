@@ -8,10 +8,9 @@ export default class MessageViewer extends Component {
         this.scrollToBottom = this.scrollToBottom.bind(this);
     }
     scrollToBottom() {
-        if (
-            this.base.clientHeight + this.base.scrollTop + this.lastMsgRef.getBoundingClientRect().height >=
-            this.base.scrollHeight
-        ) {
+        const lastMsgHeight = this.lastMsgRef ? this.lastMsgRef.getBoundingClientRect().height : 0;
+
+        if (this.lastMsgRef && this.base.clientHeight + this.base.scrollTop + lastMsgHeight >= this.base.scrollHeight) {
             this.lastMsgRef.scrollIntoView({ behavior: 'smooth' });
         }
     }

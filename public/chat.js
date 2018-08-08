@@ -1,5 +1,6 @@
 import { h, render, Component } from 'preact';
 import socket from 'socket.io-client';
+import { route } from 'preact-router';
 import TextField from 'preact-material-components/TextField';
 import 'preact-material-components/TextField/style.css';
 import FormField from 'preact-material-components/FormField';
@@ -26,7 +27,8 @@ export default class Chat extends Component {
             textAreaValue: '',
             messageList: [], //lsit of objects {from: <String>, text: <String>}
             geoMsg: '',
-            isSendDisabled: true
+            isSendDisabled: true,
+            users: []
         };
     }
     componentWillMount() {
@@ -37,28 +39,37 @@ export default class Chat extends Component {
             //     title: 'This is create email event',
             //     body: 'We successfully emitted createEmail event.'
             // });
-
-            // socket.emit('createMessage', {
-            //     from: 'Krzysiek',
-            //     text: 'This is create message text'
-            // });
         });
 
         this.io.on('disconnect', () => {
             console.log('disconnected from server');
         });
 
+        this.io.on('updateUserList', users => {
+            this.setState({ users });
+        });
+
         //to catch socket.emit from server side, on client side use socket.on to register event with the same name as emited by server
         // socket.on('newEmail', function(email) {
         //     console.log('New email', email);
         // });
-
+        console.info('componentWillMount');
         this.io.on('newMessage', msg => {
             console.log('New msg received', msg);
             this.setState({
                 messageList: [...this.state.messageList, msg]
             });
         });
+    }
+    componentDidMount() {
+        const msg = {
+            from: 'Admin',
+            text: `Welcome to chat app ${this.props.userName}`
+        };
+        this.setState({
+            messageList: [...this.state.messageList, msg]
+        });
+        this.io.emit('joinRoom', { userName: this.props.userName, roomName: this.props.roomName }, () => {});
     }
     onClickEvent() {
         const msg = { from: 'User', text: this.state.textAreaValue };
@@ -93,10 +104,9 @@ export default class Chat extends Component {
         this.setState({ textAreaValue: evt.target.value, isSendDisabled: !evt.target.value });
     }
     render(props, state) {
-        console.info('props: ', props);
         return (
             <div class="displayFlex flexRow chatComponentContainer">
-                <Sidebar />
+                <Sidebar users={state.users} />
                 <div class="displayFlex flexColumn">
                     <MessageViewer messageList={state.messageList} />
                     <FormField className="flexRow flexStart messageBox">
