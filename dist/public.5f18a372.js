@@ -20695,7 +20695,7 @@ var MessageViewer = function (_Component) {
                             ),
                             (0, _preact.h)(
                                 'span',
-                                { 'class': 'time' },
+                                { 'class': 'user time' },
                                 (0, _moment2.default)(createdAt).format('k:mm A'),
                                 ':'
                             ),

@@ -35,7 +35,7 @@ export default class MessageViewer extends Component {
                         return lat && long ? (
                             <li {...liProps}>
                                 <span class="user">{from}</span>
-                                <span class="time">{moment(createdAt).format('k:mm A')}:</span>
+                                <span class="user time">{moment(createdAt).format('k:mm A')}:</span>
                                 <a target="_blank" href={`https://www.google.com/maps?q=${lat},${long}`}>
                                     location
                                 </a>
