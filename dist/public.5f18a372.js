@@ -20903,7 +20903,7 @@ var Chat = function (_Component) {
             // socket.on('newEmail', function(email) {
             //     console.log('New email', email);
             // });
-            console.info('componentWillMount');
+
             this.io.on('newMessage', function (msg) {
                 console.log('New msg received', msg);
                 _this2.setState({
@@ -20926,7 +20926,7 @@ var Chat = function (_Component) {
     }, {
         key: 'onClickEvent',
         value: function onClickEvent() {
-            var msg = { from: 'User', text: this.state.textAreaValue };
+            var msg = { text: this.state.textAreaValue };
             //createMessage event triggeres newMessage event which is subscribed in componentWillMount
             this.io.emit('createMessage', msg, function (response) {
                 console.log(response);

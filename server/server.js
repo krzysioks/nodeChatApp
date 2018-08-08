@@ -82,8 +82,13 @@ io.on('connection', socket => {
     //     console.log('createEmail', to, title, body);
     // });
 
-    socket.on('createMessage', ({ from, text }, callback) => {
-        console.log(`createMessage from: ${from} with text: ${text}`);
+    socket.on('createMessage', ({ text }, callback) => {
+        const user = users.getUser(socket.id);
+        if (Object.keys(user).length && isRealString(text)) {
+            io.to(user.roomName).emit('newMessage', generateMessage(user.userName, text));
+            callback('All Ok');
+        }
+        //console.log(`createMessage from: ${from} with text: ${text}`);
 
         //emits event to all connected useres except myself
         // socket.broadcast.emit('newMessage', {
@@ -91,12 +96,13 @@ io.on('connection', socket => {
         //     text,
         //     createdAt: new Date().getTime()
         // });
-        io.emit('newMessage', generateMessage(from, text));
-        callback('All Ok');
     });
 
     socket.on('createLocationMessage', ({ lat, long }) => {
-        io.emit('newMessage', generateLocationMessage('Admin', lat, long));
+        const user = users.getUser(socket.id);
+        if (Object.keys(user).length) {
+            io.to(user.roomName).emit('newMessage', generateLocationMessage(user.userName, lat, long));
+        }
     });
 
     socket.on('disconnect', () => {

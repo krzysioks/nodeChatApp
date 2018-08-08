@@ -53,7 +53,7 @@ export default class Chat extends Component {
         // socket.on('newEmail', function(email) {
         //     console.log('New email', email);
         // });
-        console.info('componentWillMount');
+
         this.io.on('newMessage', msg => {
             console.log('New msg received', msg);
             this.setState({
@@ -72,7 +72,7 @@ export default class Chat extends Component {
         this.io.emit('joinRoom', { userName: this.props.userName, roomName: this.props.roomName }, () => {});
     }
     onClickEvent() {
-        const msg = { from: 'User', text: this.state.textAreaValue };
+        const msg = { text: this.state.textAreaValue };
         //createMessage event triggeres newMessage event which is subscribed in componentWillMount
         this.io.emit('createMessage', msg, response => {
             console.log(response);
