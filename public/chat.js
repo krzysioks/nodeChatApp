@@ -104,6 +104,7 @@ export default class Chat extends Component {
         this.setState({ textAreaValue: evt.target.value, isSendDisabled: !evt.target.value });
     }
     render(props, state) {
+        console.log('test:', props, state);
         return (
             <div class="displayFlex flexRow chatComponentContainer">
                 <Sidebar users={state.users} />

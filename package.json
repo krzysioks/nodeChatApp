@@ -6,10 +6,33 @@
     "scripts": {
         "start": "node server/server.js",
         "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha --timeout=5000 server/**/*.test.js",
-        "test:watch": "nodemon --exec \"npm test\""
+        "test:watch": "nodemon --exec \"npm test\"",
+        "testFront": "SET \"NODE_ENV=test\" && jest --no-cache",
+        "testFront:watch": "jest --watch"
     },
     "engines": {
         "node": "8.9.4"
+    },
+    "jest": {
+        "transform": {
+            "^.+\\.jsx$": "babel-jest",
+            "^.+\\.js$": "babel-jest"
+        },
+        "setupTestFrameworkScriptFile": "./public/chat.test.js",
+        "verbose": true,
+        "moduleDirectories": [
+            "node_modules"
+        ],
+        "modulePaths": [
+            "<rootDir>/node_modules"
+        ],
+        "moduleFileExtensions": [
+            "js",
+            "jsx"
+        ],
+        "transformIgnorePatterns": [
+            "/node_modules/(?!lodash-es)"
+        ]
     },
     "author": "",
     "license": "ISC",
@@ -27,7 +50,7 @@
         "history": "^4.7.2",
         "moment": "^2.22.2",
         "mongodb": "^3.1.1",
-        "parcel-bundler": "^1.9.7",
+        "parcel-bundler": "^1.12.3",
         "preact": "^8.2.9",
         "preact-material-components": "^1.5.0",
         "preact-router": "^2.6.1",

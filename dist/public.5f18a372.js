@@ -103,75 +103,20 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   // Override the current require with this new one
   return newRequire;
-})({"..\\node_modules\\preact\\dist\\preact.esm.js":[function(require,module,exports) {
+})({"..\\node_modules\\preact\\dist\\preact.mjs":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-/** Virtual DOM Node */
-function VNode() {}
+var VNode = function VNode() {};
 
-/** Global options
- *	@public
- *	@namespace options {Object}
- */
-var options = {
-
-	/** If `true`, `prop` changes trigger synchronous component updates.
-  *	@name syncComponentUpdates
-  *	@type Boolean
-  *	@default true
-  */
-	//syncComponentUpdates: true,
-
-	/** Processes all created VNodes.
-  *	@param {VNode} vnode	A newly-created VNode to normalize/process
-  */
-	//vnode(vnode) { }
-
-	/** Hook invoked after a component is mounted. */
-	// afterMount(component) { }
-
-	/** Hook invoked after the DOM is updated with a component's latest render. */
-	// afterUpdate(component) { }
-
-	/** Hook invoked immediately before a component is unmounted. */
-	// beforeUnmount(component) { }
-};
+var options = {};
 
 var stack = [];
 
 var EMPTY_CHILDREN = [];
 
-/**
- * JSX/hyperscript reviver.
- * @see http://jasonformat.com/wtf-is-jsx
- * Benchmarks: https://esbench.com/bench/57ee8f8e330ab09900a1a1a0
- *
- * Note: this is exported as both `h()` and `createElement()` for compatibility reasons.
- *
- * Creates a VNode (virtual DOM element). A tree of VNodes can be used as a lightweight representation
- * of the structure of a DOM tree. This structure can be realized by recursively comparing it against
- * the current _actual_ DOM structure, and applying only the differences.
- *
- * `h()`/`createElement()` accepts an element name, a list of attributes/props,
- * and optionally children to append to the element.
- *
- * @example The following DOM tree
- *
- * `<div id="foo" name="bar">Hello!</div>`
- *
- * can be constructed using this function as:
- *
- * `h('div', { id: 'foo', name : 'bar' }, 'Hello!');`
- *
- * @param {string} nodeName	An element name. Ex: `div`, `a`, `span`, etc.
- * @param {Object} attributes	Any attributes/props to set on the created element.
- * @param rest			Additional arguments are taken to be children to append. Can be infinitely nested Arrays.
- *
- * @public
- */
 function h(nodeName, attributes) {
 	var children = EMPTY_CHILDREN,
 	    lastSimple,
@@ -215,48 +160,24 @@ function h(nodeName, attributes) {
 	p.attributes = attributes == null ? undefined : attributes;
 	p.key = attributes == null ? undefined : attributes.key;
 
-	// if a "vnode hook" is defined, pass every created VNode to it
 	if (options.vnode !== undefined) options.vnode(p);
 
 	return p;
 }
 
-/**
- *  Copy all properties from `props` onto `obj`.
- *  @param {Object} obj		Object onto which properties should be copied.
- *  @param {Object} props	Object from which to copy properties.
- *  @returns obj
- *  @private
- */
 function extend(obj, props) {
 	for (var i in props) {
 		obj[i] = props[i];
 	}return obj;
 }
 
-/**
- * Call a function asynchronously, as soon as possible. Makes
- * use of HTML Promise to schedule the callback if available,
- * otherwise falling back to `setTimeout` (mainly for IE<11).
- *
- * @param {Function} callback
- */
 var defer = typeof Promise == 'function' ? Promise.resolve().then.bind(Promise.resolve()) : setTimeout;
 
-/**
- * Clones the given VNode, optionally adding attributes/props and replacing its children.
- * @param {VNode} vnode		The virtual DOM element to clone
- * @param {Object} props	Attributes/props to add when cloning
- * @param {VNode} rest		Any additional arguments will be used as replacement children.
- */
 function cloneElement(vnode, props) {
 	return h(vnode.nodeName, extend(extend({}, vnode.attributes), props), arguments.length > 2 ? [].slice.call(arguments, 2) : vnode.children);
 }
 
-// DOM properties that should NOT have "px" added when numeric
 var IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
-
-/** Managed queue of dirty components to be re-rendered */
 
 var items = [];
 
@@ -275,14 +196,6 @@ function rerender() {
 	}
 }
 
-/**
- * Check if two nodes are equivalent.
- *
- * @param {Node} node			DOM Node to compare
- * @param {VNode} vnode			Virtual DOM node to compare
- * @param {boolean} [hydrating=false]	If true, ignores component constructors when comparing.
- * @private
- */
 function isSameNodeType(node, vnode, hydrating) {
 	if (typeof vnode === 'string' || typeof vnode === 'number') {
 		return node.splitText !== undefined;
@@ -293,24 +206,10 @@ function isSameNodeType(node, vnode, hydrating) {
 	return hydrating || node._componentConstructor === vnode.nodeName;
 }
 
-/**
- * Check if an Element has a given nodeName, case-insensitively.
- *
- * @param {Element} node	A DOM Element to inspect the name of.
- * @param {String} nodeName	Unnormalized name to compare against.
- */
 function isNamedNode(node, nodeName) {
 	return node.normalizedNodeName === nodeName || node.nodeName.toLowerCase() === nodeName.toLowerCase();
 }
 
-/**
- * Reconstruct Component-style `props` from a VNode.
- * Ensures default/fallback values from `defaultProps`:
- * Own-properties of `defaultProps` not present in `vnode.attributes` are added.
- *
- * @param {VNode} vnode
- * @returns {Object} props
- */
 function getNodeProps(vnode) {
 	var props = extend({}, vnode.attributes);
 	props.children = vnode.children;
@@ -327,40 +226,21 @@ function getNodeProps(vnode) {
 	return props;
 }
 
-/** Create an element with the given nodeName.
- *	@param {String} nodeName
- *	@param {Boolean} [isSvg=false]	If `true`, creates an element within the SVG namespace.
- *	@returns {Element} node
- */
 function createNode(nodeName, isSvg) {
 	var node = isSvg ? document.createElementNS('http://www.w3.org/2000/svg', nodeName) : document.createElement(nodeName);
 	node.normalizedNodeName = nodeName;
 	return node;
 }
 
-/** Remove a child node from its parent if attached.
- *	@param {Element} node		The node to remove
- */
 function removeNode(node) {
 	var parentNode = node.parentNode;
 	if (parentNode) parentNode.removeChild(node);
 }
 
-/** Set a named attribute on the given Node, with special behavior for some names and event handlers.
- *	If `value` is `null`, the attribute/handler will be removed.
- *	@param {Element} node	An element to mutate
- *	@param {string} name	The name/key to set, such as an event or attribute name
- *	@param {any} old	The last value that was set for this name/node pair
- *	@param {any} value	An attribute value, such as a function to be used as an event handler
- *	@param {Boolean} isSvg	Are we currently diffing inside an svg?
- *	@private
- */
 function setAccessor(node, name, old, value, isSvg) {
 	if (name === 'className') name = 'class';
 
-	if (name === 'key') {
-		// ignore
-	} else if (name === 'ref') {
+	if (name === 'key') {} else if (name === 'ref') {
 		if (old) old(null);
 		if (value) value(node);
 	} else if (name === 'class' && !isSvg) {
@@ -391,10 +271,13 @@ function setAccessor(node, name, old, value, isSvg) {
 		}
 		(node._listeners || (node._listeners = {}))[name] = value;
 	} else if (name !== 'list' && name !== 'type' && !isSvg && name in node) {
-		setProperty(node, name, value == null ? '' : value);
-		if (value == null || value === false) node.removeAttribute(name);
+		try {
+			node[name] = value == null ? '' : value;
+		} catch (e) {}
+		if ((value == null || value === false) && name != 'spellcheck') node.removeAttribute(name);
 	} else {
 		var ns = isSvg && name !== (name = name.replace(/^xlink:?/, ''));
+
 		if (value == null || value === false) {
 			if (ns) node.removeAttributeNS('http://www.w3.org/1999/xlink', name.toLowerCase());else node.removeAttribute(name);
 		} else if (typeof value !== 'function') {
@@ -403,35 +286,18 @@ function setAccessor(node, name, old, value, isSvg) {
 	}
 }
 
-/** Attempt to set a DOM property to the given value.
- *	IE & FF throw for certain property-value combinations.
- */
-function setProperty(node, name, value) {
-	try {
-		node[name] = value;
-	} catch (e) {}
-}
-
-/** Proxy an event to hooked event handlers
- *	@private
- */
 function eventProxy(e) {
 	return this._listeners[e.type](options.event && options.event(e) || e);
 }
 
-/** Queue of components that have been mounted and are awaiting componentDidMount */
 var mounts = [];
 
-/** Diff recursion count, used to track the end of the diff cycle. */
 var diffLevel = 0;
 
-/** Global flag indicating if the diff is currently within an SVG */
 var isSvgMode = false;
 
-/** Global flag indicating if the diff is performing hydration */
 var hydrating = false;
 
-/** Invoke queued componentDidMount lifecycle methods */
 function flushMounts() {
 	var c;
 	while (c = mounts.pop()) {
@@ -440,56 +306,38 @@ function flushMounts() {
 	}
 }
 
-/** Apply differences in a given vnode (and it's deep children) to a real DOM Node.
- *	@param {Element} [dom=null]		A DOM node to mutate into the shape of the `vnode`
- *	@param {VNode} vnode			A VNode (with descendants forming a tree) representing the desired DOM structure
- *	@returns {Element} dom			The created/mutated element
- *	@private
- */
 function diff(dom, vnode, context, mountAll, parent, componentRoot) {
-	// diffLevel having been 0 here indicates initial entry into the diff (not a subdiff)
 	if (!diffLevel++) {
-		// when first starting the diff, check if we're diffing an SVG or within an SVG
 		isSvgMode = parent != null && parent.ownerSVGElement !== undefined;
 
-		// hydration is indicated by the existing element to be diffed not having a prop cache
 		hydrating = dom != null && !('__preactattr_' in dom);
 	}
 
 	var ret = idiff(dom, vnode, context, mountAll, componentRoot);
 
-	// append the element if its a new parent
 	if (parent && ret.parentNode !== parent) parent.appendChild(ret);
 
-	// diffLevel being reduced to 0 means we're exiting the diff
 	if (! --diffLevel) {
 		hydrating = false;
-		// invoke queued componentDidMount lifecycle methods
+
 		if (!componentRoot) flushMounts();
 	}
 
 	return ret;
 }
 
-/** Internals of `diff()`, separated to allow bypassing diffLevel / mount flushing. */
 function idiff(dom, vnode, context, mountAll, componentRoot) {
 	var out = dom,
 	    prevSvgMode = isSvgMode;
 
-	// empty values (null, undefined, booleans) render as empty Text nodes
 	if (vnode == null || typeof vnode === 'boolean') vnode = '';
 
-	// Fast case: Strings & Numbers create/update Text nodes.
 	if (typeof vnode === 'string' || typeof vnode === 'number') {
-
-		// update if it's already a Text node:
 		if (dom && dom.splitText !== undefined && dom.parentNode && (!dom._component || componentRoot)) {
-			/* istanbul ignore if */ /* Browser quirk that can't be covered: https://github.com/developit/preact/commit/fd4f21f5c45dfd75151bd27b4c217d8003aa5eb9 */
 			if (dom.nodeValue != vnode) {
 				dom.nodeValue = vnode;
 			}
 		} else {
-			// it wasn't a Text node: replace it with one and recycle the old Element
 			out = document.createTextNode(vnode);
 			if (dom) {
 				if (dom.parentNode) dom.parentNode.replaceChild(out, dom);
@@ -502,28 +350,23 @@ function idiff(dom, vnode, context, mountAll, componentRoot) {
 		return out;
 	}
 
-	// If the VNode represents a Component, perform a component diff:
 	var vnodeName = vnode.nodeName;
 	if (typeof vnodeName === 'function') {
 		return buildComponentFromVNode(dom, vnode, context, mountAll);
 	}
 
-	// Tracks entering and exiting SVG namespace when descending through the tree.
 	isSvgMode = vnodeName === 'svg' ? true : vnodeName === 'foreignObject' ? false : isSvgMode;
 
-	// If there's no existing element or it's the wrong type, create a new one:
 	vnodeName = String(vnodeName);
 	if (!dom || !isNamedNode(dom, vnodeName)) {
 		out = createNode(vnodeName, isSvgMode);
 
 		if (dom) {
-			// move children into the replacement node
 			while (dom.firstChild) {
 				out.appendChild(dom.firstChild);
-			} // if the previous Element was mounted into the DOM, replace it inline
+			}
 			if (dom.parentNode) dom.parentNode.replaceChild(out, dom);
 
-			// recycle the old element (skips non-Element node types)
 			recollectNodeTree(dom, true);
 		}
 	}
@@ -539,33 +382,21 @@ function idiff(dom, vnode, context, mountAll, componentRoot) {
 		}
 	}
 
-	// Optimization: fast-path for elements containing a single TextNode:
 	if (!hydrating && vchildren && vchildren.length === 1 && typeof vchildren[0] === 'string' && fc != null && fc.splitText !== undefined && fc.nextSibling == null) {
 		if (fc.nodeValue != vchildren[0]) {
 			fc.nodeValue = vchildren[0];
 		}
+	} else if (vchildren && vchildren.length || fc != null) {
+		innerDiffNode(out, vchildren, context, mountAll, hydrating || props.dangerouslySetInnerHTML != null);
 	}
-	// otherwise, if there are existing or new children, diff them:
-	else if (vchildren && vchildren.length || fc != null) {
-			innerDiffNode(out, vchildren, context, mountAll, hydrating || props.dangerouslySetInnerHTML != null);
-		}
 
-	// Apply attributes/props from VNode to the DOM Element:
 	diffAttributes(out, vnode.attributes, props);
 
-	// restore previous SVG mode: (in case we're exiting an SVG namespace)
 	isSvgMode = prevSvgMode;
 
 	return out;
 }
 
-/** Apply child and attribute changes between a VNode and a DOM Node to the DOM.
- *	@param {Element} dom			Element whose children should be compared & mutated
- *	@param {Array} vchildren		Array of VNodes to compare to `dom.childNodes`
- *	@param {Object} context			Implicitly descendant context object (from most recent `getChildContext()`)
- *	@param {Boolean} mountAll
- *	@param {Boolean} isHydrating	If `true`, consumes externally created elements similar to hydration
- */
 function innerDiffNode(dom, vchildren, context, mountAll, isHydrating) {
 	var originalChildren = dom.childNodes,
 	    children = [],
@@ -581,7 +412,6 @@ function innerDiffNode(dom, vchildren, context, mountAll, isHydrating) {
 	    vchild,
 	    child;
 
-	// Build up a map of keyed children and an Array of unkeyed children:
 	if (len !== 0) {
 		for (var i = 0; i < len; i++) {
 			var _child = originalChildren[i],
@@ -601,7 +431,6 @@ function innerDiffNode(dom, vchildren, context, mountAll, isHydrating) {
 			vchild = vchildren[i];
 			child = null;
 
-			// attempt to find a node based on key matching
 			var key = vchild.key;
 			if (key != null) {
 				if (keyedLen && keyed[key] !== undefined) {
@@ -609,21 +438,18 @@ function innerDiffNode(dom, vchildren, context, mountAll, isHydrating) {
 					keyed[key] = undefined;
 					keyedLen--;
 				}
-			}
-			// attempt to pluck a node of the same type from the existing children
-			else if (!child && min < childrenLen) {
-					for (j = min; j < childrenLen; j++) {
-						if (children[j] !== undefined && isSameNodeType(c = children[j], vchild, isHydrating)) {
-							child = c;
-							children[j] = undefined;
-							if (j === childrenLen - 1) childrenLen--;
-							if (j === min) min++;
-							break;
-						}
+			} else if (min < childrenLen) {
+				for (j = min; j < childrenLen; j++) {
+					if (children[j] !== undefined && isSameNodeType(c = children[j], vchild, isHydrating)) {
+						child = c;
+						children[j] = undefined;
+						if (j === childrenLen - 1) childrenLen--;
+						if (j === min) min++;
+						break;
 					}
 				}
+			}
 
-			// morph the matched/found/created DOM child to match vchild (deep)
 			child = idiff(child, vchild, context, mountAll);
 
 			f = originalChildren[i];
@@ -639,31 +465,22 @@ function innerDiffNode(dom, vchildren, context, mountAll, isHydrating) {
 		}
 	}
 
-	// remove unused keyed children:
 	if (keyedLen) {
 		for (var i in keyed) {
 			if (keyed[i] !== undefined) recollectNodeTree(keyed[i], false);
 		}
 	}
 
-	// remove orphaned unkeyed children:
 	while (min <= childrenLen) {
 		if ((child = children[childrenLen--]) !== undefined) recollectNodeTree(child, false);
 	}
 }
 
-/** Recursively recycle (or just unmount) a node and its descendants.
- *	@param {Node} node						DOM node to start unmount/removal from
- *	@param {Boolean} [unmountOnly=false]	If `true`, only triggers unmount lifecycle, skips removal
- */
 function recollectNodeTree(node, unmountOnly) {
 	var component = node._component;
 	if (component) {
-		// if node is owned by a Component, unmount that component (ends up recursing back here)
 		unmountComponent(component);
 	} else {
-		// If the node's VNode had a ref function, invoke it with null here.
-		// (this is part of the React spec, and smart for unsetting references)
 		if (node['__preactattr_'] != null && node['__preactattr_'].ref) node['__preactattr_'].ref(null);
 
 		if (unmountOnly === false || node['__preactattr_'] == null) {
@@ -674,10 +491,6 @@ function recollectNodeTree(node, unmountOnly) {
 	}
 }
 
-/** Recollect/unmount all children.
- *	- we use .lastChild here because it causes less reflow than .firstChild
- *	- it's also cheaper than accessing the .childNodes Live NodeList
- */
 function removeChildren(node) {
 	node = node.lastChild;
 	while (node) {
@@ -687,22 +500,15 @@ function removeChildren(node) {
 	}
 }
 
-/** Apply differences in attributes from a VNode to the given DOM Element.
- *	@param {Element} dom		Element with attributes to diff `attrs` against
- *	@param {Object} attrs		The desired end-state key-value attribute pairs
- *	@param {Object} old			Current/previous attributes (from previous VNode or element's prop cache)
- */
 function diffAttributes(dom, attrs, old) {
 	var name;
 
-	// remove attributes no longer present on the vnode by setting them to undefined
 	for (name in old) {
 		if (!(attrs && attrs[name] != null) && old[name] != null) {
 			setAccessor(dom, name, old[name], old[name] = undefined, isSvgMode);
 		}
 	}
 
-	// add new & update changed attributes
 	for (name in attrs) {
 		if (name !== 'children' && name !== 'innerHTML' && (!(name in old) || attrs[name] !== (name === 'value' || name === 'checked' ? dom[name] : old[name]))) {
 			setAccessor(dom, name, old[name], old[name] = attrs[name], isSvgMode);
@@ -710,22 +516,11 @@ function diffAttributes(dom, attrs, old) {
 	}
 }
 
-/** Retains a pool of Components for re-use, keyed on component name.
- *	Note: since component names are not unique or even necessarily available, these are primarily a form of sharding.
- *	@private
- */
-var components = {};
+var recyclerComponents = [];
 
-/** Reclaim a component for later re-use by the recycler. */
-function collectComponent(component) {
-	var name = component.constructor.name;
-	(components[name] || (components[name] = [])).push(component);
-}
-
-/** Create a component. Normalizes differences between PFC's and classful Components. */
 function createComponent(Ctor, props, context) {
-	var list = components[Ctor.name],
-	    inst;
+	var inst,
+	    i = recyclerComponents.length;
 
 	if (Ctor.prototype && Ctor.prototype.render) {
 		inst = new Ctor(props, context);
@@ -736,40 +531,36 @@ function createComponent(Ctor, props, context) {
 		inst.render = doRender;
 	}
 
-	if (list) {
-		for (var i = list.length; i--;) {
-			if (list[i].constructor === Ctor) {
-				inst.nextBase = list[i].nextBase;
-				list.splice(i, 1);
-				break;
-			}
+	while (i--) {
+		if (recyclerComponents[i].constructor === Ctor) {
+			inst.nextBase = recyclerComponents[i].nextBase;
+			recyclerComponents.splice(i, 1);
+			return inst;
 		}
 	}
+
 	return inst;
 }
 
-/** The `.render()` method for a PFC backing instance. */
 function doRender(props, state, context) {
 	return this.constructor(props, context);
 }
 
-/** Set a component's `props` (generally derived from JSX attributes).
- *	@param {Object} props
- *	@param {Object} [opts]
- *	@param {boolean} [opts.renderSync=false]	If `true` and {@link options.syncComponentUpdates} is `true`, triggers synchronous rendering.
- *	@param {boolean} [opts.render=true]			If `false`, no render will be triggered.
- */
-function setComponentProps(component, props, opts, context, mountAll) {
+function setComponentProps(component, props, renderMode, context, mountAll) {
 	if (component._disable) return;
 	component._disable = true;
 
-	if (component.__ref = props.ref) delete props.ref;
-	if (component.__key = props.key) delete props.key;
+	component.__ref = props.ref;
+	component.__key = props.key;
+	delete props.ref;
+	delete props.key;
 
-	if (!component.base || mountAll) {
-		if (component.componentWillMount) component.componentWillMount();
-	} else if (component.componentWillReceiveProps) {
-		component.componentWillReceiveProps(props, context);
+	if (typeof component.constructor.getDerivedStateFromProps === 'undefined') {
+		if (!component.base || mountAll) {
+			if (component.componentWillMount) component.componentWillMount();
+		} else if (component.componentWillReceiveProps) {
+			component.componentWillReceiveProps(props, context);
+		}
 	}
 
 	if (context && context !== component.context) {
@@ -782,8 +573,8 @@ function setComponentProps(component, props, opts, context, mountAll) {
 
 	component._disable = false;
 
-	if (opts !== 0) {
-		if (opts === 1 || options.syncComponentUpdates !== false || !component.base) {
+	if (renderMode !== 0) {
+		if (renderMode === 1 || options.syncComponentUpdates !== false || !component.base) {
 			renderComponent(component, 1, mountAll);
 		} else {
 			enqueueRender(component);
@@ -793,13 +584,7 @@ function setComponentProps(component, props, opts, context, mountAll) {
 	if (component.__ref) component.__ref(component);
 }
 
-/** Render a Component, triggering necessary lifecycle events and taking High-Order Components into account.
- *	@param {Component} component
- *	@param {Object} [opts]
- *	@param {boolean} [opts.build=false]		If `true`, component will build and store a DOM node if not already associated with one.
- *	@private
- */
-function renderComponent(component, opts, mountAll, isChild) {
+function renderComponent(component, renderMode, mountAll, isChild) {
 	if (component._disable) return;
 
 	var props = component.props,
@@ -813,16 +598,21 @@ function renderComponent(component, opts, mountAll, isChild) {
 	    initialBase = isUpdate || nextBase,
 	    initialChildComponent = component._component,
 	    skip = false,
+	    snapshot = previousContext,
 	    rendered,
 	    inst,
 	    cbase;
 
-	// if updating
+	if (component.constructor.getDerivedStateFromProps) {
+		state = extend(extend({}, state), component.constructor.getDerivedStateFromProps(props, state));
+		component.state = state;
+	}
+
 	if (isUpdate) {
 		component.props = previousProps;
 		component.state = previousState;
 		component.context = previousContext;
-		if (opts !== 2 && component.shouldComponentUpdate && component.shouldComponentUpdate(props, state, context) === false) {
+		if (renderMode !== 2 && component.shouldComponentUpdate && component.shouldComponentUpdate(props, state, context) === false) {
 			skip = true;
 		} else if (component.componentWillUpdate) {
 			component.componentWillUpdate(props, state, context);
@@ -838,9 +628,12 @@ function renderComponent(component, opts, mountAll, isChild) {
 	if (!skip) {
 		rendered = component.render(props, state, context);
 
-		// context to pass to the child, can be updated via (grand-)parent component
 		if (component.getChildContext) {
 			context = extend(extend({}, context), component.getChildContext());
+		}
+
+		if (isUpdate && component.getSnapshotBeforeUpdate) {
+			snapshot = component.getSnapshotBeforeUpdate(previousProps, previousState);
 		}
 
 		var childComponent = rendered && rendered.nodeName,
@@ -848,7 +641,6 @@ function renderComponent(component, opts, mountAll, isChild) {
 		    base;
 
 		if (typeof childComponent === 'function') {
-			// set up high order component link
 
 			var childProps = getNodeProps(rendered);
 			inst = initialChildComponent;
@@ -869,13 +661,12 @@ function renderComponent(component, opts, mountAll, isChild) {
 		} else {
 			cbase = initialBase;
 
-			// destroy high order component link
 			toUnmount = initialChildComponent;
 			if (toUnmount) {
 				cbase = component._component = null;
 			}
 
-			if (initialBase || opts === 1) {
+			if (initialBase || renderMode === 1) {
 				if (cbase) cbase._component = null;
 				base = diff(cbase, rendered, context, mountAll || !isUpdate, initialBase && initialBase.parentNode, true);
 			}
@@ -912,32 +703,18 @@ function renderComponent(component, opts, mountAll, isChild) {
 	if (!isUpdate || mountAll) {
 		mounts.unshift(component);
 	} else if (!skip) {
-		// Ensure that pending componentDidMount() hooks of child components
-		// are called before the componentDidUpdate() hook in the parent.
-		// Note: disabled as it causes duplicate hooks, see https://github.com/developit/preact/issues/750
-		// flushMounts();
 
 		if (component.componentDidUpdate) {
-			component.componentDidUpdate(previousProps, previousState, previousContext);
+			component.componentDidUpdate(previousProps, previousState, snapshot);
 		}
 		if (options.afterUpdate) options.afterUpdate(component);
 	}
 
-	if (component._renderCallbacks != null) {
-		while (component._renderCallbacks.length) {
-			component._renderCallbacks.pop().call(component);
-		}
-	}
-
-	if (!diffLevel && !isChild) flushMounts();
+	while (component._renderCallbacks.length) {
+		component._renderCallbacks.pop().call(component);
+	}if (!diffLevel && !isChild) flushMounts();
 }
 
-/** Apply the Component referenced by a VNode to the DOM.
- *	@param {Element} dom	The DOM node to mutate
- *	@param {VNode} vnode	A Component-referencing VNode
- *	@returns {Element} dom	The created/mutated element
- *	@private
- */
 function buildComponentFromVNode(dom, vnode, context, mountAll) {
 	var c = dom && dom._component,
 	    originalComponent = c,
@@ -961,7 +738,7 @@ function buildComponentFromVNode(dom, vnode, context, mountAll) {
 		c = createComponent(vnode.nodeName, props, context);
 		if (dom && !c.nextBase) {
 			c.nextBase = dom;
-			// passing dom/oldDom as nextBase will recycle it if unused, so bypass recycling on L229:
+
 			oldDom = null;
 		}
 		setComponentProps(c, props, 1, context, mountAll);
@@ -976,10 +753,6 @@ function buildComponentFromVNode(dom, vnode, context, mountAll) {
 	return dom;
 }
 
-/** Remove a component from the DOM and recycle it.
- *	@param {Component} component	The Component instance to unmount
- *	@private
- */
 function unmountComponent(component) {
 	if (options.beforeUnmount) options.beforeUnmount(component);
 
@@ -991,7 +764,6 @@ function unmountComponent(component) {
 
 	component.base = null;
 
-	// recursively tear down & recollect high-order component children:
 	var inner = component._component;
 	if (inner) {
 		unmountComponent(inner);
@@ -1001,7 +773,7 @@ function unmountComponent(component) {
 		component.nextBase = base;
 
 		removeNode(base);
-		collectComponent(component);
+		recyclerComponents.push(component);
 
 		removeChildren(base);
 	}
@@ -1009,93 +781,32 @@ function unmountComponent(component) {
 	if (component.__ref) component.__ref(null);
 }
 
-/** Base Component class.
- *	Provides `setState()` and `forceUpdate()`, which trigger rendering.
- *	@public
- *
- *	@example
- *	class MyFoo extends Component {
- *		render(props, state) {
- *			return <div />;
- *		}
- *	}
- */
 function Component(props, context) {
 	this._dirty = true;
 
-	/** @public
-  *	@type {object}
-  */
 	this.context = context;
 
-	/** @public
-  *	@type {object}
-  */
 	this.props = props;
 
-	/** @public
-  *	@type {object}
-  */
 	this.state = this.state || {};
+
+	this._renderCallbacks = [];
 }
 
 extend(Component.prototype, {
-
-	/** Returns a `boolean` indicating if the component should re-render when receiving the given `props` and `state`.
-  *	@param {object} nextProps
-  *	@param {object} nextState
-  *	@param {object} nextContext
-  *	@returns {Boolean} should the component re-render
-  *	@name shouldComponentUpdate
-  *	@function
-  */
-
-	/** Update component state by copying properties from `state` to `this.state`.
-  *	@param {object} state		A hash of state properties to update with new values
-  *	@param {function} callback	A function to be called once component state is updated
-  */
 	setState: function setState(state, callback) {
-		var s = this.state;
-		if (!this.prevState) this.prevState = extend({}, s);
-		extend(s, typeof state === 'function' ? state(s, this.props) : state);
-		if (callback) (this._renderCallbacks = this._renderCallbacks || []).push(callback);
+		if (!this.prevState) this.prevState = this.state;
+		this.state = extend(extend({}, this.state), typeof state === 'function' ? state(this.state, this.props) : state);
+		if (callback) this._renderCallbacks.push(callback);
 		enqueueRender(this);
 	},
-
-	/** Immediately perform a synchronous re-render of the component.
-  *	@param {function} callback		A function to be called after component is re-rendered.
-  *	@private
-  */
 	forceUpdate: function forceUpdate(callback) {
-		if (callback) (this._renderCallbacks = this._renderCallbacks || []).push(callback);
+		if (callback) this._renderCallbacks.push(callback);
 		renderComponent(this, 2);
 	},
-
-	/** Accepts `props` and `state`, and returns a new Virtual DOM tree to build.
-  *	Virtual DOM is generally constructed via [JSX](http://jasonformat.com/wtf-is-jsx).
-  *	@param {object} props		Props (eg: JSX attributes) received from parent element/component
-  *	@param {object} state		The component's current state
-  *	@param {object} context		Context object (if a parent component has provided context)
-  *	@returns VNode
-  */
 	render: function render() {}
 });
 
-/** Render JSX into a `parent` Element.
- *	@param {VNode} vnode		A (JSX) VNode to render
- *	@param {Element} parent		DOM element to render into
- *	@param {Element} [merge]	Attempt to re-use an existing DOM tree rooted at `merge`
- *	@public
- *
- *	@example
- *	// render a div into <body>:
- *	render(<div id="hello">hello!</div>, document.body);
- *
- *	@example
- *	// render a "Thing" component into #foo:
- *	const Thing = ({ name }) => <span>{ name }</span>;
- *	render(<Thing name="one" />, document.querySelector('#foo'));
- */
 function render(vnode, parent, merge) {
 	return diff(merge, vnode, {}, false, parent, false);
 }
@@ -1118,7 +829,7 @@ exports.Component = Component;
 exports.render = render;
 exports.rerender = rerender;
 exports.options = options;
-//# sourceMappingURL=preact.esm.js.map
+//# sourceMappingURL=preact.mjs.map
 },{}],"..\\node_modules\\preact-router\\dist\\preact-router.es.js":[function(require,module,exports) {
 'use strict';
 
@@ -1502,7 +1213,7 @@ exports.Route = Route;
 exports.Link = Link;
 exports.default = Router;
 //# sourceMappingURL=preact-router.es.js.map
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js"}],"..\\node_modules\\warning\\browser.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.mjs"}],"..\\node_modules\\warning\\browser.js":[function(require,module,exports) {
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -11381,7 +11092,161 @@ exports.connect = lookup;
 exports.Manager = require('./manager');
 exports.Socket = require('./socket');
 
-},{"./url":"..\\node_modules\\socket.io-client\\lib\\url.js","socket.io-parser":"..\\node_modules\\socket.io-parser\\index.js","./manager":"..\\node_modules\\socket.io-client\\lib\\manager.js","debug":"..\\node_modules\\debug\\src\\browser.js","./socket":"..\\node_modules\\socket.io-client\\lib\\socket.js"}],"..\\node_modules\\@material\\base\\foundation.js":[function(require,module,exports) {
+},{"./url":"..\\node_modules\\socket.io-client\\lib\\url.js","socket.io-parser":"..\\node_modules\\socket.io-parser\\index.js","./manager":"..\\node_modules\\socket.io-client\\lib\\manager.js","debug":"..\\node_modules\\debug\\src\\browser.js","./socket":"..\\node_modules\\socket.io-client\\lib\\socket.js"}],"..\\node_modules\\@babel\\runtime\\helpers\\interopRequireDefault.js":[function(require,module,exports) {
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
+}
+
+module.exports = _interopRequireDefault;
+},{}],"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js":[function(require,module,exports) {
+function _getPrototypeOf(o) {
+  module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
+
+module.exports = _getPrototypeOf;
+},{}],"..\\node_modules\\@babel\\runtime\\helpers\\superPropBase.js":[function(require,module,exports) {
+var getPrototypeOf = require("./getPrototypeOf");
+
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = getPrototypeOf(object);
+    if (object === null) break;
+  }
+
+  return object;
+}
+
+module.exports = _superPropBase;
+},{"./getPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js"}],"..\\node_modules\\@babel\\runtime\\helpers\\get.js":[function(require,module,exports) {
+var getPrototypeOf = require("./getPrototypeOf");
+
+var superPropBase = require("./superPropBase");
+
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    module.exports = _get = Reflect.get;
+  } else {
+    module.exports = _get = function _get(target, property, receiver) {
+      var base = superPropBase(target, property);
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+
+      return desc.value;
+    };
+  }
+
+  return _get(target, property, receiver || target);
+}
+
+module.exports = _get;
+},{"./getPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js","./superPropBase":"..\\node_modules\\@babel\\runtime\\helpers\\superPropBase.js"}],"..\\node_modules\\@babel\\runtime\\helpers\\classCallCheck.js":[function(require,module,exports) {
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+module.exports = _classCallCheck;
+},{}],"..\\node_modules\\@babel\\runtime\\helpers\\createClass.js":[function(require,module,exports) {
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+module.exports = _createClass;
+},{}],"..\\node_modules\\@babel\\runtime\\helpers\\typeof.js":[function(require,module,exports) {
+function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
+
+function _typeof(obj) {
+  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
+    module.exports = _typeof = function _typeof(obj) {
+      return _typeof2(obj);
+    };
+  } else {
+    module.exports = _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
+    };
+  }
+
+  return _typeof(obj);
+}
+
+module.exports = _typeof;
+},{}],"..\\node_modules\\@babel\\runtime\\helpers\\assertThisInitialized.js":[function(require,module,exports) {
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+module.exports = _assertThisInitialized;
+},{}],"..\\node_modules\\@babel\\runtime\\helpers\\possibleConstructorReturn.js":[function(require,module,exports) {
+var _typeof = require("../helpers/typeof");
+
+var assertThisInitialized = require("./assertThisInitialized");
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (_typeof(call) === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return assertThisInitialized(self);
+}
+
+module.exports = _possibleConstructorReturn;
+},{"../helpers/typeof":"..\\node_modules\\@babel\\runtime\\helpers\\typeof.js","./assertThisInitialized":"..\\node_modules\\@babel\\runtime\\helpers\\assertThisInitialized.js"}],"..\\node_modules\\@babel\\runtime\\helpers\\setPrototypeOf.js":[function(require,module,exports) {
+function _setPrototypeOf(o, p) {
+  module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p;
+    return o;
+  };
+
+  return _setPrototypeOf(o, p);
+}
+
+module.exports = _setPrototypeOf;
+},{}],"..\\node_modules\\@babel\\runtime\\helpers\\inherits.js":[function(require,module,exports) {
+var setPrototypeOf = require("./setPrototypeOf");
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) setPrototypeOf(subClass, superClass);
+}
+
+module.exports = _inherits;
+},{"./setPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\setPrototypeOf.js"}],"..\\node_modules\\@material\\base\\foundation.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -12102,7 +11967,7 @@ class MDCRippleFoundation extends _foundation2.default {
    * @return {boolean}
    * @private
    */
-  isSupported_() {
+  supportsPressRipple_() {
     return this.adapter_.browserSupportsCssVars();
   }
 
@@ -12122,57 +11987,61 @@ class MDCRippleFoundation extends _foundation2.default {
 
   /** @override */
   init() {
-    if (!this.isSupported_()) {
-      return;
-    }
-    this.registerRootHandlers_();
+    const supportsPressRipple = this.supportsPressRipple_();
 
-    const { ROOT, UNBOUNDED } = MDCRippleFoundation.cssClasses;
-    requestAnimationFrame(() => {
-      this.adapter_.addClass(ROOT);
-      if (this.adapter_.isUnbounded()) {
-        this.adapter_.addClass(UNBOUNDED);
-        // Unbounded ripples need layout logic applied immediately to set coordinates for both shade and ripple
-        this.layoutInternal_();
-      }
-    });
+    this.registerRootHandlers_(supportsPressRipple);
+
+    if (supportsPressRipple) {
+      const { ROOT, UNBOUNDED } = MDCRippleFoundation.cssClasses;
+      requestAnimationFrame(() => {
+        this.adapter_.addClass(ROOT);
+        if (this.adapter_.isUnbounded()) {
+          this.adapter_.addClass(UNBOUNDED);
+          // Unbounded ripples need layout logic applied immediately to set coordinates for both shade and ripple
+          this.layoutInternal_();
+        }
+      });
+    }
   }
 
   /** @override */
   destroy() {
-    if (!this.isSupported_()) {
-      return;
-    }
+    if (this.supportsPressRipple_()) {
+      if (this.activationTimer_) {
+        clearTimeout(this.activationTimer_);
+        this.activationTimer_ = 0;
+        const { FG_ACTIVATION } = MDCRippleFoundation.cssClasses;
+        this.adapter_.removeClass(FG_ACTIVATION);
+      }
 
-    if (this.activationTimer_) {
-      clearTimeout(this.activationTimer_);
-      this.activationTimer_ = 0;
-      const { FG_ACTIVATION } = MDCRippleFoundation.cssClasses;
-      this.adapter_.removeClass(FG_ACTIVATION);
+      const { ROOT, UNBOUNDED } = MDCRippleFoundation.cssClasses;
+      requestAnimationFrame(() => {
+        this.adapter_.removeClass(ROOT);
+        this.adapter_.removeClass(UNBOUNDED);
+        this.removeCssVars_();
+      });
     }
 
     this.deregisterRootHandlers_();
     this.deregisterDeactivationHandlers_();
-
-    const { ROOT, UNBOUNDED } = MDCRippleFoundation.cssClasses;
-    requestAnimationFrame(() => {
-      this.adapter_.removeClass(ROOT);
-      this.adapter_.removeClass(UNBOUNDED);
-      this.removeCssVars_();
-    });
   }
 
-  /** @private */
-  registerRootHandlers_() {
-    ACTIVATION_EVENT_TYPES.forEach(type => {
-      this.adapter_.registerInteractionHandler(type, this.activateHandler_);
-    });
+  /**
+   * @param {boolean} supportsPressRipple Passed from init to save a redundant function call
+   * @private
+   */
+  registerRootHandlers_(supportsPressRipple) {
+    if (supportsPressRipple) {
+      ACTIVATION_EVENT_TYPES.forEach(type => {
+        this.adapter_.registerInteractionHandler(type, this.activateHandler_);
+      });
+      if (this.adapter_.isUnbounded()) {
+        this.adapter_.registerResizeHandler(this.resizeHandler_);
+      }
+    }
+
     this.adapter_.registerInteractionHandler('focus', this.focusHandler_);
     this.adapter_.registerInteractionHandler('blur', this.blurHandler_);
-
-    if (this.adapter_.isUnbounded()) {
-      this.adapter_.registerResizeHandler(this.resizeHandler_);
-    }
   }
 
   /**
@@ -12692,144 +12561,7 @@ exports.MDCRipple = MDCRipple;
 exports.MDCRippleFoundation = _foundation2.default;
 exports.RippleCapableSurface = RippleCapableSurface;
 exports.util = util;
-},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","./adapter":"..\\node_modules\\@material\\ripple\\adapter.js","./foundation":"..\\node_modules\\@material\\ripple\\foundation.js","./util":"..\\node_modules\\@material\\ripple\\util.js"}],"..\\node_modules\\preact-material-components\\MaterialComponent.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _preact = require('preact');
-
-var _ripple = require('@material/ripple');
-
-/**
- * Base class for every Material component in this package
- * NOTE: every component should add a ref by the name of `control` to its root dom for autoInit Properties
- *
- * @export
- * @class MaterialComponent
- * @extends {Component}
- */
-class MaterialComponent extends _preact.Component {
-  constructor() {
-    super();
-    // Attributes inside this array will be check for boolean value true
-    // and will be converted to mdc classes
-    this._mdcProps = [];
-    // This will again be used to add apt classname to the component
-    this.componentName = '';
-    // The final class name given to the dom
-    this.classText = '';
-    // Shared setter for the root element ref
-    this.setControlRef = control => {
-      this.control = control;
-    };
-  }
-  attachRipple() {
-    if (this.props.ripple && this.control) {
-      _ripple.MDCRipple.attachTo(this.control);
-    }
-  }
-  // Build the className based on component names and mdc props
-  buildClassName() {
-    // Class name based on component name
-    this.classText = 'mdc-' + this.componentName;
-
-    // Loop over mdcProps to turn them into classNames
-    for (let propKey in this.props) {
-      if (this.props.hasOwnProperty(propKey)) {
-        const prop = this.props[propKey];
-        if (typeof prop === 'boolean' && prop) {
-          if (this._mdcProps.indexOf(propKey) !== -1) {
-            this.classText += ' mdc-' + this.componentName + '--' + propKey;
-          }
-        }
-      }
-    }
-  }
-
-  getClassName(element) {
-    if (!element) {
-      return '';
-    }
-    const attrs = element.attributes = element.attributes || {};
-    let classText = this.classText;
-    if (attrs.class) {
-      classText += ' ' + attrs.class;
-    }
-    if (attrs.className && attrs.className !== attrs.class) {
-      classText += ' ' + attrs.className;
-    }
-    return classText;
-  }
-
-  // Components must implement this method for their specific DOM structure
-  materialDom(props) {
-    return (0, _preact.h)('div', Object.assign({}, props), props.children);
-  }
-
-  render() {
-    this.buildClassName();
-    // Fetch a VNode
-    const componentProps = this.props;
-    const userDefinedClasses = componentProps.className || componentProps.class || '';
-    // We delete class props and add them later in the final
-    // step so every component does not need to handle user specified classes.
-    if (componentProps['class']) delete componentProps['class'];
-    if (componentProps['className']) delete componentProps['className'];
-
-    const element = this.materialDom(componentProps);
-    element.attributes = element.attributes || {};
-
-    element.attributes.className = `${userDefinedClasses} ${this.getClassName(element)}`.split(' ').filter((value, index, self) => self.indexOf(value) === index && value !== '') // Unique + exclude empty class names
-    .join(' ');
-    // Clean this shit of proxy attributes
-    this._mdcProps.forEach(prop => {
-      delete element.attributes[prop];
-    });
-    return element;
-  }
-}
-exports.default = MaterialComponent;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","@material/ripple":"..\\node_modules\\@material\\ripple\\index.js"}],"..\\node_modules\\preact-material-components\\Icon\\index.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _preact = require("preact");
-
-var _MaterialComponent = _interopRequireDefault(require("../MaterialComponent"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-/**
- * @prop disabled = false
- */
-class Icon extends _MaterialComponent.default {
-  constructor() {
-    super();
-    this.componentName = 'icon';
-  }
-
-  materialDom(props) {
-    let classes = ['material-icons']; // CardActionIcon sends className
-
-    props.className && classes.push(props.className);
-    return (0, _preact.h)("i", _extends({}, props, {
-      className: classes.join(' ')
-    }), props.children);
-  }
-
-}
-
-exports.default = Icon;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","../MaterialComponent":"..\\node_modules\\preact-material-components\\MaterialComponent.js"}],"..\\node_modules\\@material\\textfield\\constants.js":[function(require,module,exports) {
+},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","./adapter":"..\\node_modules\\@material\\ripple\\adapter.js","./foundation":"..\\node_modules\\@material\\ripple\\foundation.js","./util":"..\\node_modules\\@material\\ripple\\util.js"}],"..\\node_modules\\@material\\textfield\\constants.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -14845,7 +14577,7 @@ class MDCFloatingLabel extends _component2.default {
 
 exports.MDCFloatingLabel = MDCFloatingLabel;
 exports.MDCFloatingLabelFoundation = _foundation2.default;
-},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","./adapter":"..\\node_modules\\@material\\floating-label\\adapter.js","./foundation":"..\\node_modules\\@material\\floating-label\\foundation.js"}],"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\adapter.js":[function(require,module,exports) {
+},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","./adapter":"..\\node_modules\\@material\\floating-label\\adapter.js","./foundation":"..\\node_modules\\@material\\floating-label\\foundation.js"}],"..\\node_modules\\@material\\notched-outline\\adapter.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14921,7 +14653,7 @@ class MDCNotchedOutlineAdapter {
 }
 
 exports.default = MDCNotchedOutlineAdapter;
-},{}],"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\constants.js":[function(require,module,exports) {
+},{}],"..\\node_modules\\@material\\notched-outline\\constants.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -14957,7 +14689,7 @@ const cssClasses = {
 
 exports.cssClasses = cssClasses;
 exports.strings = strings;
-},{}],"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\foundation.js":[function(require,module,exports) {
+},{}],"..\\node_modules\\@material\\notched-outline\\foundation.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -15082,7 +14814,7 @@ class MDCNotchedOutlineFoundation extends _foundation2.default {
    */
 
 exports.default = MDCNotchedOutlineFoundation;
-},{"@material/base/foundation":"..\\node_modules\\@material\\base\\foundation.js","./adapter":"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\adapter.js","./constants":"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\constants.js"}],"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\index.js":[function(require,module,exports) {
+},{"@material/base/foundation":"..\\node_modules\\@material\\base\\foundation.js","./adapter":"..\\node_modules\\@material\\notched-outline\\adapter.js","./constants":"..\\node_modules\\@material\\notched-outline\\constants.js"}],"..\\node_modules\\@material\\notched-outline\\index.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -15176,7 +14908,7 @@ class MDCNotchedOutline extends _component2.default {
 
 exports.MDCNotchedOutline = MDCNotchedOutline;
 exports.MDCNotchedOutlineFoundation = _foundation2.default;
-},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","./adapter":"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\adapter.js","./foundation":"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\foundation.js","./constants":"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\constants.js"}],"..\\node_modules\\@material\\textfield\\index.js":[function(require,module,exports) {
+},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","./adapter":"..\\node_modules\\@material\\notched-outline\\adapter.js","./foundation":"..\\node_modules\\@material\\notched-outline\\foundation.js","./constants":"..\\node_modules\\@material\\notched-outline\\constants.js"}],"..\\node_modules\\@material\\textfield\\index.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -15646,255 +15378,797 @@ exports.MDCTextFieldHelperText = _index3.MDCTextFieldHelperText;
 exports.MDCTextFieldHelperTextFoundation = _index3.MDCTextFieldHelperTextFoundation;
 exports.MDCTextFieldIcon = _index4.MDCTextFieldIcon;
 exports.MDCTextFieldIconFoundation = _index4.MDCTextFieldIconFoundation;
-},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","@material/ripple/index":"..\\node_modules\\@material\\ripple\\index.js","@material/ripple/util":"..\\node_modules\\@material\\ripple\\util.js","./constants":"..\\node_modules\\@material\\textfield\\constants.js","./adapter":"..\\node_modules\\@material\\textfield\\adapter.js","./foundation":"..\\node_modules\\@material\\textfield\\foundation.js","@material/line-ripple/index":"..\\node_modules\\@material\\line-ripple\\index.js","./helper-text/index":"..\\node_modules\\@material\\textfield\\helper-text\\index.js","./icon/index":"..\\node_modules\\@material\\textfield\\icon\\index.js","@material/floating-label/index":"..\\node_modules\\@material\\floating-label\\index.js","@material/notched-outline/index":"..\\node_modules\\@material\\textfield\\node_modules\\@material\\notched-outline\\index.js"}],"..\\node_modules\\preact-material-components\\TextField\\index.js":[function(require,module,exports) {
-"use strict";
+},{"@material/base/component":"..\\node_modules\\@material\\base\\component.js","@material/ripple/index":"..\\node_modules\\@material\\ripple\\index.js","@material/ripple/util":"..\\node_modules\\@material\\ripple\\util.js","./constants":"..\\node_modules\\@material\\textfield\\constants.js","./adapter":"..\\node_modules\\@material\\textfield\\adapter.js","./foundation":"..\\node_modules\\@material\\textfield\\foundation.js","@material/line-ripple/index":"..\\node_modules\\@material\\line-ripple\\index.js","./helper-text/index":"..\\node_modules\\@material\\textfield\\helper-text\\index.js","./icon/index":"..\\node_modules\\@material\\textfield\\icon\\index.js","@material/floating-label/index":"..\\node_modules\\@material\\floating-label\\index.js","@material/notched-outline/index":"..\\node_modules\\@material\\notched-outline\\index.js"}],"..\\node_modules\\autobind-decorator\\lib\\index.js":[function(require,module,exports) {
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+exports.default = autobind;
+/**
+ * @copyright 2015, Andrey Popp <8mayday@gmail.com>
+ *
+ * The decorator may be used on classes or methods
+ * ```
+ * @autobind
+ * class FullBound {}
+ *
+ * class PartBound {
+ *   @autobind
+ *   method () {}
+ * }
+ * ```
+ */
+function autobind() {
+  if (arguments.length === 1) {
+    return boundClass.apply(undefined, arguments);
+  } else {
+    return boundMethod.apply(undefined, arguments);
+  }
+}
+
+/**
+ * Use boundMethod to bind all methods on the target.prototype
+ */
+function boundClass(target) {
+  // (Using reflect to get all keys including symbols)
+  var keys = void 0;
+  // Use Reflect if exists
+  if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
+    keys = Reflect.ownKeys(target.prototype);
+  } else {
+    keys = Object.getOwnPropertyNames(target.prototype);
+    // use symbols if support is provided
+    if (typeof Object.getOwnPropertySymbols === 'function') {
+      keys = keys.concat(Object.getOwnPropertySymbols(target.prototype));
+    }
+  }
+
+  keys.forEach(function (key) {
+    // Ignore special case target method
+    if (key === 'constructor') {
+      return;
+    }
+
+    var descriptor = Object.getOwnPropertyDescriptor(target.prototype, key);
+
+    // Only methods need binding
+    if (typeof descriptor.value === 'function') {
+      Object.defineProperty(target.prototype, key, boundMethod(target, key, descriptor));
+    }
+  });
+  return target;
+}
+
+/**
+ * Return a descriptor removing the value and returning a getter
+ * The getter will return a .bind version of the function
+ * and memoize the result against a symbol on the instance
+ */
+function boundMethod(target, key, descriptor) {
+  var fn = descriptor.value;
+
+  if (typeof fn !== 'function') {
+    throw new Error('@autobind decorator can only be applied to methods not: ' + (typeof fn === 'undefined' ? 'undefined' : _typeof(fn)));
+  }
+
+  // In IE11 calling Object.defineProperty has a side-effect of evaluating the
+  // getter for the property which is being replaced. This causes infinite
+  // recursion and an "Out of stack space" error.
+  var definingProperty = false;
+
+  return {
+    configurable: true,
+    get: function get() {
+      if (definingProperty || this === target.prototype || this.hasOwnProperty(key) || typeof fn !== 'function') {
+        return fn;
+      }
+
+      var boundFn = fn.bind(this);
+      definingProperty = true;
+      Object.defineProperty(this, key, {
+        configurable: true,
+        get: function get() {
+          return boundFn;
+        },
+        set: function set(value) {
+          fn = value;
+          delete this[key];
+        }
+      });
+      definingProperty = false;
+      return boundFn;
+    },
+    set: function set(value) {
+      fn = value;
+    }
+  };
+}
+
+},{}],"..\\node_modules\\preact-material-components\\Base\\MaterialComponent.js":[function(require,module,exports) {
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.MaterialComponent = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _ripple = require("@material/ripple");
+
+var _autobindDecorator = _interopRequireDefault(require("autobind-decorator"));
 
 var _preact = require("preact");
 
-var _Icon = _interopRequireDefault(require("../Icon"));
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if ((typeof Reflect === "undefined" ? "undefined" : (0, _typeof2.default)(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+    if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  }
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+var doNotRemoveProps = ['disabled'];
+/**
+ * Base class for every Material component in this package
+ * NOTE: every component should add a ref by the name of `control` to its root dom for autoInit Properties
+ *
+ * @export
+ * @class MaterialComponent
+ * @extends {Component}
+ */
+
+var MaterialComponent =
+/*#__PURE__*/
+function (_Component) {
+  (0, _inherits2.default)(MaterialComponent, _Component);
+
+  function MaterialComponent() {
+    (0, _classCallCheck2.default)(this, MaterialComponent);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(MaterialComponent).apply(this, arguments));
+  }
+
+  (0, _createClass2.default)(MaterialComponent, [{
+    key: "render",
+    value: function render(props) {
+      if (!this.classText) {
+        this.classText = this.buildClassName(props);
+      } // Fetch a VNode
+
+
+      var componentProps = props;
+      var userDefinedClasses = componentProps.className || componentProps.class || ''; // We delete class props and add them later in the final
+      // step so every component does not need to handle user specified classes.
+
+      if (componentProps.class) {
+        delete componentProps.class;
+      }
+
+      if (componentProps.className) {
+        delete componentProps.className;
+      }
+
+      var element = this.materialDom(componentProps);
+      element.attributes = element.attributes || {};
+      element.attributes.className = "".concat(userDefinedClasses, " ").concat(this.getClassName(element)).split(' ').filter(function (value, index, self) {
+        return self.indexOf(value) === index && value !== '';
+      }) // Unique + exclude empty class names
+      .join(' '); // Clean this shit of proxy attributes
+
+      this.mdcProps.forEach(function (prop) {
+        // TODO: Fix this better
+        if (prop in doNotRemoveProps) {
+          return;
+        }
+
+        delete element.attributes[prop];
+      });
+      return element;
+    }
+    /** Attach the ripple effect */
+
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (this.props.ripple && this.control) {
+        this.ripple = new _ripple.MDCRipple(this.control);
+      }
+    }
+  }, {
+    key: "componentWillUpdate",
+    value: function componentWillUpdate(nextProps) {
+      if (this.MDComponent && this.mdcNotifyProps) {
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = this.mdcNotifyProps[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var prop = _step.value;
+
+            if (this.props[prop] !== nextProps[prop]) {
+              this.MDComponent[prop] = nextProps[prop];
+            }
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return != null) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = this.mdcProps[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var _prop = _step2.value;
+
+          if (this.props[_prop] !== nextProps[_prop]) {
+            this.classText = this.buildClassName(nextProps);
+            break;
+          }
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      if (this.ripple) {
+        this.ripple.destroy();
+      }
+    }
+  }, {
+    key: "afterComponentDidMount",
+    value: function afterComponentDidMount() {
+      if (this.MDComponent && this.mdcNotifyProps) {
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
+
+        try {
+          for (var _iterator3 = this.mdcNotifyProps[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var prop = _step3.value;
+            this.MDComponent[prop] = this.props[prop];
+          }
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+              _iterator3.return();
+            }
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
+            }
+          }
+        }
+      }
+    } // Shared setter for the root element ref
+
+  }, {
+    key: "setControlRef",
+    value: function setControlRef(control) {
+      this.control = control;
+    }
+    /** Build the className based on component names and mdc props */
+
+  }, {
+    key: "buildClassName",
+    value: function buildClassName(props) {
+      // Class name based on component name
+      var classText = 'mdc-' + this.componentName; // Loop over mdcProps to turn them into classNames
+
+      for (var propKey in props) {
+        if (props.hasOwnProperty(propKey)) {
+          var prop = props[propKey];
+
+          if (typeof prop === 'boolean' && prop) {
+            if (this.mdcProps.indexOf(propKey) !== -1) {
+              classText += " mdc-".concat(this.componentName, "--").concat(propKey);
+            }
+          }
+        }
+      }
+
+      return classText;
+    }
+    /** Returns the class name for element */
+
+  }, {
+    key: "getClassName",
+    value: function getClassName(element) {
+      if (!element) {
+        return '';
+      }
+
+      var attrs = element.attributes = element.attributes || {};
+      var classText = this.classText;
+
+      if (attrs.class) {
+        classText += ' ' + attrs.class;
+      }
+
+      if (attrs.className && attrs.className !== attrs.class) {
+        classText += ' ' + attrs.className;
+      }
+
+      return classText;
+    }
+  }]);
+  return MaterialComponent;
+}(_preact.Component);
+
+exports.MaterialComponent = MaterialComponent;
+
+__decorate([_autobindDecorator.default], MaterialComponent.prototype, "afterComponentDidMount", null);
+
+__decorate([_autobindDecorator.default], MaterialComponent.prototype, "setControlRef", null);
+
+__decorate([_autobindDecorator.default], MaterialComponent.prototype, "buildClassName", null);
+
+__decorate([_autobindDecorator.default], MaterialComponent.prototype, "getClassName", null);
+
+var _default = MaterialComponent;
+exports.default = _default;
+//# sourceMappingURL=MaterialComponent.js.map
+},{"@babel/runtime/helpers/interopRequireDefault":"..\\node_modules\\@babel\\runtime\\helpers\\interopRequireDefault.js","@babel/runtime/helpers/classCallCheck":"..\\node_modules\\@babel\\runtime\\helpers\\classCallCheck.js","@babel/runtime/helpers/createClass":"..\\node_modules\\@babel\\runtime\\helpers\\createClass.js","@babel/runtime/helpers/possibleConstructorReturn":"..\\node_modules\\@babel\\runtime\\helpers\\possibleConstructorReturn.js","@babel/runtime/helpers/getPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js","@babel/runtime/helpers/inherits":"..\\node_modules\\@babel\\runtime\\helpers\\inherits.js","@babel/runtime/helpers/typeof":"..\\node_modules\\@babel\\runtime\\helpers\\typeof.js","@material/ripple":"..\\node_modules\\@material\\ripple\\index.js","autobind-decorator":"..\\node_modules\\autobind-decorator\\lib\\index.js","preact":"..\\node_modules\\preact\\dist\\preact.mjs"}],"..\\node_modules\\preact-material-components\\Icon\\index.js":[function(require,module,exports) {
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.Icon = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _autobindDecorator = _interopRequireDefault(require("autobind-decorator"));
+
+var _preact = require("preact");
+
+var _MaterialComponent2 = _interopRequireDefault(require("../Base/MaterialComponent"));
+
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if ((typeof Reflect === "undefined" ? "undefined" : (0, _typeof2.default)(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+    if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  }
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+var Icon =
+/*#__PURE__*/
+function (_MaterialComponent) {
+  (0, _inherits2.default)(Icon, _MaterialComponent);
+
+  function Icon() {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, Icon);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Icon).apply(this, arguments));
+    _this.componentName = 'icon';
+    _this.mdcProps = [];
+    return _this;
+  }
+
+  (0, _createClass2.default)(Icon, [{
+    key: "materialDom",
+    value: function materialDom(props) {
+      var classes = ['material-icons']; // CardActionIcon sends className
+
+      if (props.className) {
+        classes.push(props.className);
+      }
+
+      return (0, _preact.h)("i", Object.assign({}, props, {
+        className: classes.join(' ')
+      }), props.children);
+    }
+  }]);
+  return Icon;
+}(_MaterialComponent2.default);
+
+exports.Icon = Icon;
+
+__decorate([_autobindDecorator.default], Icon.prototype, "materialDom", null);
+
+var _default = Icon;
+exports.default = _default;
+//# sourceMappingURL=index.js.map
+},{"@babel/runtime/helpers/interopRequireDefault":"..\\node_modules\\@babel\\runtime\\helpers\\interopRequireDefault.js","@babel/runtime/helpers/classCallCheck":"..\\node_modules\\@babel\\runtime\\helpers\\classCallCheck.js","@babel/runtime/helpers/createClass":"..\\node_modules\\@babel\\runtime\\helpers\\createClass.js","@babel/runtime/helpers/possibleConstructorReturn":"..\\node_modules\\@babel\\runtime\\helpers\\possibleConstructorReturn.js","@babel/runtime/helpers/getPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js","@babel/runtime/helpers/inherits":"..\\node_modules\\@babel\\runtime\\helpers\\inherits.js","@babel/runtime/helpers/typeof":"..\\node_modules\\@babel\\runtime\\helpers\\typeof.js","autobind-decorator":"..\\node_modules\\autobind-decorator\\lib\\index.js","preact":"..\\node_modules\\preact\\dist\\preact.mjs","../Base/MaterialComponent":"..\\node_modules\\preact-material-components\\Base\\MaterialComponent.js"}],"..\\node_modules\\preact-material-components\\TextField\\index.js":[function(require,module,exports) {
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.TextField = exports.TextFieldInput = exports.Label = exports.HelperText = void 0;
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
 
 var _textfield = require("@material/textfield");
 
-var _MaterialComponent = _interopRequireDefault(require("../MaterialComponent"));
+var _autobindDecorator = _interopRequireDefault(require("autobind-decorator"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _preact = require("preact");
 
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+var _MaterialComponent4 = _interopRequireDefault(require("../Base/MaterialComponent"));
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+var _Icon = _interopRequireDefault(require("../Icon"));
 
-/**
- * @prop persistent = false
- * @prop validation-msg = false
- */
-class HelperText extends _MaterialComponent.default {
-  constructor() {
-    super();
-    this.componentName = 'text-field-helper-text';
-    this._mdcProps = ['persistent', 'validation-msg'];
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if ((typeof Reflect === "undefined" ? "undefined" : (0, _typeof2.default)(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+    if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  }
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+var __rest = void 0 && (void 0).__rest || function (s, e) {
+  var t = {};
+
+  for (var p in s) {
+    if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
   }
 
-  materialDom(props) {
-    return (0, _preact.h)("p", _extends({}, props, {
-      "aria-hidden": "true"
-    }), props.children);
+  if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+    if (e.indexOf(p[i]) < 0) t[p[i]] = s[p[i]];
+  }
+  return t;
+};
+
+var HelperText =
+/*#__PURE__*/
+function (_MaterialComponent) {
+  (0, _inherits2.default)(HelperText, _MaterialComponent);
+
+  function HelperText() {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, HelperText);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(HelperText).apply(this, arguments));
+    _this.componentName = 'text-field-helper-text';
+    _this.mdcProps = ['persistent', 'validation-msg'];
+    return _this;
   }
 
-}
+  (0, _createClass2.default)(HelperText, [{
+    key: "materialDom",
+    value: function materialDom(props) {
+      return (0, _preact.h)("p", Object.assign({}, props, {
+        "aria-hidden": "true"
+      }), props.children);
+    }
+  }]);
+  return HelperText;
+}(_MaterialComponent4.default);
 
-class Label extends _MaterialComponent.default {
-  constructor() {
-    super();
-    this.componentName = 'floating-label';
+exports.HelperText = HelperText;
+
+__decorate([_autobindDecorator.default], HelperText.prototype, "materialDom", null);
+
+var Label =
+/*#__PURE__*/
+function (_MaterialComponent2) {
+  (0, _inherits2.default)(Label, _MaterialComponent2);
+
+  function Label() {
+    var _this2;
+
+    (0, _classCallCheck2.default)(this, Label);
+    _this2 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Label).apply(this, arguments));
+    _this2.componentName = 'floating-label';
+    _this2.mdcProps = [];
+    return _this2;
   }
 
-  materialDom(props) {
-    return (0, _preact.h)("label", props, props.children);
+  (0, _createClass2.default)(Label, [{
+    key: "materialDom",
+    value: function materialDom(props) {
+      return (0, _preact.h)("label", Object.assign({}, props), props.children);
+    }
+  }]);
+  return Label;
+}(_MaterialComponent4.default);
+
+exports.Label = Label;
+
+__decorate([_autobindDecorator.default], Label.prototype, "materialDom", null);
+
+var TextFieldInput =
+/*#__PURE__*/
+function (_MaterialComponent3) {
+  (0, _inherits2.default)(TextFieldInput, _MaterialComponent3);
+
+  function TextFieldInput() {
+    var _this3;
+
+    (0, _classCallCheck2.default)(this, TextFieldInput);
+    _this3 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(TextFieldInput).apply(this, arguments));
+    _this3.state = {
+      showFloatingLabel: false
+    };
+    _this3.componentName = 'text-field';
+    _this3.mdcProps = ['fullwidth', 'textarea', 'dense', 'disabled', 'box', 'outlined'];
+    _this3.mdcNotifyProps = ['valid', 'disabled'];
+    return _this3;
   }
 
-}
+  (0, _createClass2.default)(TextFieldInput, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this4 = this;
 
-const defaultProps = {
+      (0, _get2.default)((0, _getPrototypeOf2.default)(TextFieldInput.prototype), "componentDidMount", this).call(this);
+      this.setState({
+        showFloatingLabel: true
+      }, function () {
+        if (_this4.control) {
+          _this4.MDComponent = new _textfield.MDCTextField(_this4.control);
+
+          if (_this4.props.onInit) {
+            _this4.props.onInit(_this4.MDComponent);
+          }
+
+          if (_this4.props.value) {
+            _this4.MDComponent.value = _this4.props.value;
+          }
+        }
+
+        _this4.afterComponentDidMount();
+      });
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      (0, _get2.default)((0, _getPrototypeOf2.default)(TextFieldInput.prototype), "componentWillUnmount", this).call(this);
+
+      if (this.MDComponent) {
+        this.MDComponent.destroy();
+      }
+    }
+  }, {
+    key: "getValue",
+    value: function getValue() {
+      return this.MDComponent ? this.MDComponent.value : null;
+    }
+  }, {
+    key: "materialDom",
+    value: function materialDom(allprops) {
+      var className = allprops.className,
+          outerStyle = allprops.outerStyle,
+          outlined = allprops.outlined,
+          props = __rest(allprops, ["className", "outerStyle", "outlined"]);
+
+      className = className || '';
+
+      if ('leadingIcon' in props) {
+        className += ' mdc-text-field--box mdc-text-field--with-leading-icon';
+      }
+
+      if ('trailingIcon' in props) {
+        className += ' mdc-text-field--box mdc-text-field--with-trailing-icon';
+      }
+
+      if ('value' in props && this.state.showFloatingLabel) {
+        className = [className, 'mdc-text-field--upgraded'].join(' ');
+      }
+
+      if (props.label && props.fullwidth) {
+        console.log('Passing a "label" prop is not supported when using a "fullwidth" text field.');
+      } // noinspection RequiredAttributes
+
+
+      return (0, _preact.h)("div", {
+        className: className,
+        ref: this.setControlRef,
+        style: outerStyle
+      }, props.leadingIcon ? (0, _preact.h)(_Icon.default, {
+        className: "mdc-text-field__icon"
+      }, props.leadingIcon) : null, props.textarea ? (0, _preact.h)("textarea", Object.assign({
+        className: "mdc-text-field__input"
+      }, props)) : (0, _preact.h)("input", Object.assign({
+        type: props.type || 'text',
+        className: "mdc-text-field__input"
+      }, props)), props.label && this.state.showFloatingLabel && (0, _preact.h)(Label, {
+        for: props.id
+      }, props.label), props.trailingIcon ? (0, _preact.h)(_Icon.default, {
+        className: "mdc-text-field__icon"
+      }, props.trailingIcon) : null, props.textarea || outlined ? null : (0, _preact.h)("div", {
+        class: "mdc-line-ripple"
+      }), outlined ? (0, _preact.h)("div", {
+        class: "mdc-notched-outline"
+      }, (0, _preact.h)("svg", null, (0, _preact.h)("path", {
+        className: "mdc-notched-outline__path"
+      }))) : null, outlined ? (0, _preact.h)("div", {
+        className: "mdc-notched-outline__idle"
+      }) : null);
+    }
+  }, {
+    key: "buildClassName",
+    value: function buildClassName(props) {
+      var cn = (0, _get2.default)((0, _getPrototypeOf2.default)(TextFieldInput.prototype), "buildClassName", this).call(this, props);
+
+      if (this.MDComponent) {
+        cn += ' mdc-text-field--upgraded';
+      }
+
+      return cn;
+    }
+  }]);
+  return TextFieldInput;
+}(_MaterialComponent4.default);
+
+exports.TextFieldInput = TextFieldInput;
+TextFieldInput.defaultProps = {
   valid: true
 };
-/**
- * @prop fullwidth = false
- * @prop textarea = false
- * @prop dense = false
- * @prop disabled = false
- * @prop outlined = false
- * @prop box = false
- * @prop type = 'text'
- * @prop outerStyle = {[key: string]: string}
- * @prop value = ''
- * @prop label = ''
- */
 
-class TextFieldInput extends _MaterialComponent.default {
-  constructor() {
-    super();
-    this.componentName = 'text-field';
-    this._mdcProps = ['fullwidth', 'textarea', 'dense', 'disabled', 'box', 'outlined'];
-    this.state = {
+__decorate([_autobindDecorator.default], TextFieldInput.prototype, "getValue", null);
+
+__decorate([_autobindDecorator.default], TextFieldInput.prototype, "materialDom", null);
+
+__decorate([_autobindDecorator.default], TextFieldInput.prototype, "buildClassName", null);
+
+var TextField =
+/*#__PURE__*/
+function (_Component) {
+  (0, _inherits2.default)(TextField, _Component);
+
+  function TextField() {
+    var _this5;
+
+    (0, _classCallCheck2.default)(this, TextField);
+    _this5 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(TextField).apply(this, arguments));
+    _this5.state = {
       showFloatingLabel: false
     };
+    _this5.id = TextField.uid();
+    return _this5;
   }
 
-  componentDidMount() {
-    this.setState({
-      showFloatingLabel: true
-    }, () => {
-      this.MDComponent = new _textfield.MDCTextField(this.control);
-      this.props.onInit && this.props.onInit(this.MDComponent);
-      setValid(defaultProps, this.props, this.MDComponent);
-    });
-  }
-
-  componentWillUpdate(nextProps) {
-    setValid(this.props, nextProps, this.MDComponent);
-  }
-
-  componentWillUnmount() {
-    this.MDComponent && this.MDComponent.destroy && this.MDComponent.destroy();
-  }
-
-  getValue() {
-    return this.MDComponent ? this.MDComponent.value : null;
-  }
-
-  materialDom(allprops) {
-    let className = allprops.className,
-        outerStyle = allprops.outerStyle,
-        outlined = allprops.outlined,
-        props = _objectWithoutProperties(allprops, ["className", "outerStyle", "outlined"]);
-
-    className = className || '';
-
-    if ('leadingIcon' in props) {
-      className += ' mdc-text-field--box mdc-text-field--with-leading-icon';
+  (0, _createClass2.default)(TextField, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.setState({
+        showFloatingLabel: true
+      });
     }
+  }, {
+    key: "render",
+    value: function render(allprops, _ref) {
+      var _this6 = this;
 
-    if ('trailingIcon' in props) {
-      className += ' mdc-text-field--box mdc-text-field--with-trailing-icon';
-    }
+      var showFloatingLabel = _ref.showFloatingLabel;
 
-    if ('value' in props && this.state.showFloatingLabel) {
-      className = [className, 'mdc-text-field--upgraded'].join(' ');
-    }
-
-    if (props.label && props.fullwidth) {
-      console.log('Passing a "label" prop is not supported when using a "fullwidth" text field.');
-    }
-
-    return (0, _preact.h)("div", {
-      className: className,
-      ref: this.setControlRef,
-      style: outerStyle
-    }, props.leadingIcon ? (0, _preact.h)(_Icon.default, {
-      className: "mdc-text-field__icon"
-    }, props.leadingIcon) : null, props.textarea ? (0, _preact.h)("textarea", _extends({
-      className: "mdc-text-field__input"
-    }, props)) : (0, _preact.h)("input", _extends({
-      type: props.type || 'text',
-      className: "mdc-text-field__input"
-    }, props)), props.label && this.state.showFloatingLabel && (0, _preact.h)(Label, {
-      "for": props.id
-    }, props.label), props.trailingIcon ? (0, _preact.h)(_Icon.default, {
-      className: "mdc-text-field__icon"
-    }, props.trailingIcon) : null, props.textarea || outlined ? null : (0, _preact.h)("div", {
-      "class": "mdc-line-ripple"
-    }), outlined ? (0, _preact.h)("div", {
-      "class": "mdc-notched-outline"
-    }, (0, _preact.h)("svg", null, (0, _preact.h)("path", {
-      className: "mdc-notched-outline__path"
-    }))) : null, outlined ? (0, _preact.h)("div", {
-      className: "mdc-notched-outline__idle"
-    }) : null);
-  }
-
-}
-/**
- * @prop fullwidth = false
- * @prop textarea = false
- * @prop dense = false
- * @prop disabled = false
- * @prop outlined = false
- * @prop box = false
- * @prop type = 'text'
- * @prop outerStyle = {}
- * @prop value = ''
- * @prop label = ''
- * @prop helperText = ''
- * @prop helperTextPersistent = false
- * @prop helperTextValidationMsg = false
- */
-
-
-class TextField extends _preact.Component {
-  constructor() {
-    super();
-    this.id = TextField.uid();
-    this.state = {
-      showFloatingLabel: false
-    };
-  }
-
-  componentDidMount() {
-    this.setState({
-      showFloatingLabel: true
-    });
-  }
-
-  static uid() {
-    if (!this.uidCounter) {
-      this.uidCounter = 0;
-    }
-
-    return ++this.uidCounter;
-  }
-
-  render(allprops, {
-    showFloatingLabel
-  }) {
-    const className = allprops.className,
+      var className = allprops.className,
           outerStyle = allprops.outerStyle,
           helperTextPersistent = allprops.helperTextPersistent,
           helperTextValidationMsg = allprops.helperTextValidationMsg,
-          props = _objectWithoutProperties(allprops, ["className", "outerStyle", "helperTextPersistent", "helperTextValidationMsg"]);
+          props = __rest(allprops, ["className", "outerStyle", "helperTextPersistent", "helperTextValidationMsg"]);
 
-    const showDiv = props.helperText || props.label && !showFloatingLabel;
+      var showDiv = props.helperText || props.label && !showFloatingLabel;
 
-    if ((props.helperText || props.label) && !props.id) {
-      props.id = 'tf-' + this.id;
-    } // Helper text
+      if ((props.helperText || props.label) && !props.id) {
+        props.id = "tf-".concat(this.id);
+      } // Helper text
 
 
-    const helperTextProps = {
-      persistent: helperTextPersistent,
-      'validation-msg': helperTextValidationMsg
-    };
-    return showDiv ? (0, _preact.h)("div", {
-      className: className,
-      style: outerStyle
-    }, props.label && !showFloatingLabel && (0, _preact.h)("label", {
-      "for": props.id
-    }, props.cssLabel || `${props.label}: `), (0, _preact.h)(TextFieldInput, _extends({}, props, {
-      onInit: MDComponent => {
-        this.MDComponent = MDComponent;
-      },
-      "aria-controls": props.helperText && props.id + '-helper-text'
-    })), props.helperText && (0, _preact.h)(HelperText, _extends({
-      id: props.id + '-helper-text'
-    }, helperTextProps), props.helperText)) : (0, _preact.h)(TextFieldInput, _extends({}, props, {
-      className: className,
-      outerStyle: outerStyle,
-      onInit: MDComponent => {
-        this.MDComponent = MDComponent;
-      }
-    }));
-  }
+      var helperTextProps = {
+        persistent: helperTextPersistent,
+        'validation-msg': helperTextValidationMsg
+      };
+      return showDiv ? (0, _preact.h)("div", {
+        className: className,
+        style: outerStyle
+      }, props.label && !showFloatingLabel && (0, _preact.h)("label", {
+        for: props.id
+      }, props.cssLabel || "".concat(props.label, ": ")), (0, _preact.h)(TextFieldInput, Object.assign({}, props, {
+        onInit: function onInit(MDComponent) {
+          _this6.MDComponent = MDComponent;
+        },
+        "aria-controls": props.helperText && "".concat(props.id, "-helper-text")
+      })), props.helperText && (0, _preact.h)(HelperText, Object.assign({
+        id: "".concat(props.id, "-helper-text")
+      }, helperTextProps), props.helperText)) : (0, _preact.h)(TextFieldInput, Object.assign({}, props, {
+        className: className,
+        outerStyle: outerStyle,
+        onInit: function onInit(MDComponent) {
+          _this6.MDComponent = MDComponent;
+        }
+      }));
+    }
+  }], [{
+    key: "uid",
+    value: function uid() {
+      return ++this.uidCounter;
+    }
+  }]);
+  return TextField;
+}(_preact.Component);
 
-}
-
+exports.TextField = TextField;
 TextField.defaultProps = {
   outerStyle: {}
 };
-
-function setValid(oldprops, newprops, textfield) {
-  if ('valid' in oldprops && 'valid' in newprops && oldprops.valid !== newprops.valid) {
-    textfield.valid = newprops.valid;
-  }
-}
-
-TextField.Helptext = HelperText;
+TextField.HelperText = HelperText;
+TextField.uidCounter = 0;
 var _default = TextField;
 exports.default = _default;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","../Icon":"..\\node_modules\\preact-material-components\\Icon\\index.js","@material/textfield":"..\\node_modules\\@material\\textfield\\index.js","../MaterialComponent":"..\\node_modules\\preact-material-components\\MaterialComponent.js"}],"..\\node_modules\\parcel-bundler\\src\\builtins\\bundle-url.js":[function(require,module,exports) {
+//# sourceMappingURL=index.js.map
+},{"@babel/runtime/helpers/interopRequireDefault":"..\\node_modules\\@babel\\runtime\\helpers\\interopRequireDefault.js","@babel/runtime/helpers/get":"..\\node_modules\\@babel\\runtime\\helpers\\get.js","@babel/runtime/helpers/classCallCheck":"..\\node_modules\\@babel\\runtime\\helpers\\classCallCheck.js","@babel/runtime/helpers/createClass":"..\\node_modules\\@babel\\runtime\\helpers\\createClass.js","@babel/runtime/helpers/possibleConstructorReturn":"..\\node_modules\\@babel\\runtime\\helpers\\possibleConstructorReturn.js","@babel/runtime/helpers/getPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js","@babel/runtime/helpers/inherits":"..\\node_modules\\@babel\\runtime\\helpers\\inherits.js","@babel/runtime/helpers/typeof":"..\\node_modules\\@babel\\runtime\\helpers\\typeof.js","@material/textfield":"..\\node_modules\\@material\\textfield\\index.js","autobind-decorator":"..\\node_modules\\autobind-decorator\\lib\\index.js","preact":"..\\node_modules\\preact\\dist\\preact.mjs","../Base/MaterialComponent":"..\\node_modules\\preact-material-components\\Base\\MaterialComponent.js","../Icon":"..\\node_modules\\preact-material-components\\Icon\\index.js"}],"..\\node_modules\\parcel-bundler\\src\\builtins\\bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -15964,32 +16238,73 @@ module.exports = reloadCSS;
 },{"_css_loader":"..\\node_modules\\parcel-bundler\\src\\builtins\\css-loader.js"}],"..\\node_modules\\preact-material-components\\FormField\\index.js":[function(require,module,exports) {
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = exports.Formfield = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _autobindDecorator = _interopRequireDefault(require("autobind-decorator"));
 
 var _preact = require("preact");
 
-var _MaterialComponent = _interopRequireDefault(require("../MaterialComponent"));
+var _MaterialComponent2 = _interopRequireDefault(require("../Base/MaterialComponent"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if ((typeof Reflect === "undefined" ? "undefined" : (0, _typeof2.default)(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+    if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  }
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 
-/**
- * @prop mini = false
- * @prop plain = false
- */
-class Formfield extends _MaterialComponent.default {
-  constructor() {
-    super();
-    this.componentName = 'form-field';
-    this._mdcProps = ['align-end'];
+var Formfield =
+/*#__PURE__*/
+function (_MaterialComponent) {
+  (0, _inherits2.default)(Formfield, _MaterialComponent);
+
+  function Formfield() {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, Formfield);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Formfield).apply(this, arguments));
+    _this.componentName = 'form-field';
+    _this.mdcProps = ['align-end'];
+    return _this;
   }
 
-}
+  (0, _createClass2.default)(Formfield, [{
+    key: "materialDom",
+    value: function materialDom(props) {
+      return (0, _preact.h)("div", Object.assign({}, props), this.props.children);
+    }
+  }]);
+  return Formfield;
+}(_MaterialComponent2.default);
 
-exports.default = Formfield;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","../MaterialComponent":"..\\node_modules\\preact-material-components\\MaterialComponent.js"}],"..\\node_modules\\preact-material-components\\Radio\\style.css":[function(require,module,exports) {
+exports.Formfield = Formfield;
+
+__decorate([_autobindDecorator.default], Formfield.prototype, "materialDom", null);
+
+var _default = Formfield;
+exports.default = _default;
+//# sourceMappingURL=index.js.map
+},{"@babel/runtime/helpers/interopRequireDefault":"..\\node_modules\\@babel\\runtime\\helpers\\interopRequireDefault.js","@babel/runtime/helpers/classCallCheck":"..\\node_modules\\@babel\\runtime\\helpers\\classCallCheck.js","@babel/runtime/helpers/createClass":"..\\node_modules\\@babel\\runtime\\helpers\\createClass.js","@babel/runtime/helpers/possibleConstructorReturn":"..\\node_modules\\@babel\\runtime\\helpers\\possibleConstructorReturn.js","@babel/runtime/helpers/getPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js","@babel/runtime/helpers/inherits":"..\\node_modules\\@babel\\runtime\\helpers\\inherits.js","@babel/runtime/helpers/typeof":"..\\node_modules\\@babel\\runtime\\helpers\\typeof.js","autobind-decorator":"..\\node_modules\\autobind-decorator\\lib\\index.js","preact":"..\\node_modules\\preact\\dist\\preact.mjs","../Base/MaterialComponent":"..\\node_modules\\preact-material-components\\Base\\MaterialComponent.js"}],"..\\node_modules\\preact-material-components\\Radio\\style.css":[function(require,module,exports) {
 
         var reloadCSS = require('_css_loader');
         module.hot.dispose(reloadCSS);
@@ -16002,82 +16317,123 @@ exports.default = Formfield;
         module.hot.accept(reloadCSS);
       
 },{"_css_loader":"..\\node_modules\\parcel-bundler\\src\\builtins\\css-loader.js"}],"..\\node_modules\\preact-material-components\\themeUtils\\generateThemeClass.js":[function(require,module,exports) {
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (prop) {
-  return 'mdc-theme--' + prop + '-bg';
-};
-},{}],"..\\node_modules\\preact-material-components\\Button\\index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = _default;
+
+function _default(prop) {
+  return "mdc-theme--".concat(prop, "-bg");
+}
+//# sourceMappingURL=generateThemeClass.js.map
+},{}],"..\\node_modules\\preact-material-components\\Button\\index.js":[function(require,module,exports) {
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.Button = exports.ButtonIcon = void 0;
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _autobindDecorator = _interopRequireDefault(require("autobind-decorator"));
 
 var _preact = require("preact");
 
-var _MaterialComponent = _interopRequireDefault(require("../MaterialComponent"));
+var _MaterialComponent2 = _interopRequireDefault(require("../Base/MaterialComponent"));
 
-var _Icon = _interopRequireDefault(require("../Icon/"));
+var _Icon2 = _interopRequireDefault(require("../Icon"));
 
 var _generateThemeClass = _interopRequireDefault(require("../themeUtils/generateThemeClass"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var __decorate = void 0 && (void 0).__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if ((typeof Reflect === "undefined" ? "undefined" : (0, _typeof2.default)(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+    if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  }
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+var ButtonIcon =
+/*#__PURE__*/
+function (_Icon) {
+  (0, _inherits2.default)(ButtonIcon, _Icon);
 
-/**
- *  @prop dense = false
- *  @prop raised = false
- *  @prop compact = false
- *  @prop disabled = false
- *  @prop unelevated = false
- *  @prop stroked = false
- */
-class Button extends _MaterialComponent.default {
-  constructor() {
-    super();
-    this.componentName = 'button';
-    this._mdcProps = ['dense', 'raised', 'unelevated', 'outlined'];
-    this.themeProps = ['primary', 'secondary'];
+  function ButtonIcon() {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, ButtonIcon);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(ButtonIcon).apply(this, arguments));
+    _this.componentName = 'button__icon';
+    return _this;
   }
 
-  componentDidMount() {
-    super.attachRipple();
+  return ButtonIcon;
+}(_Icon2.default);
+
+exports.ButtonIcon = ButtonIcon;
+
+var Button =
+/*#__PURE__*/
+function (_MaterialComponent) {
+  (0, _inherits2.default)(Button, _MaterialComponent);
+
+  function Button() {
+    var _this2;
+
+    (0, _classCallCheck2.default)(this, Button);
+    _this2 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Button).apply(this, arguments));
+    _this2.componentName = 'button';
+    _this2.mdcProps = ['dense', 'raised', 'unelevated', 'outlined'];
+    _this2.themeProps = ['primary', 'secondary'];
+    return _this2;
   }
 
-  materialDom(props) {
-    const ButtonElement = props.href ? 'a' : 'button';
-    let className = '';
-    this.themeProps.forEach(themeProp => {
-      if (themeProp in props && props[themeProp] !== false) className += (0, _generateThemeClass.default)(themeProp) + ' ';
-    });
-    return (0, _preact.h)(ButtonElement, _extends({
-      ref: this.setControlRef
-    }, props, {
-      className: className
-    }), this.props.children);
-  }
+  (0, _createClass2.default)(Button, [{
+    key: "materialDom",
+    value: function materialDom(props) {
+      var ButtonElement = props.href ? 'a' : 'button';
+      var className = '';
+      this.themeProps.forEach(function (themeProp) {
+        if (themeProp in props && props[themeProp] !== false) {
+          className += (0, _generateThemeClass.default)(themeProp) + ' ';
+        }
+      });
+      return (0, _preact.h)(ButtonElement, Object.assign({
+        ref: this.setControlRef
+      }, props, {
+        className: className
+      }), this.props.children);
+    }
+  }]);
+  return Button;
+}(_MaterialComponent2.default);
 
-}
-
-class ButtonIcon extends _Icon.default {
-  constructor() {
-    super();
-    this.componentName = 'button__icon';
-  }
-
-}
-
+exports.Button = Button;
 Button.Icon = ButtonIcon;
+
+__decorate([_autobindDecorator.default], Button.prototype, "materialDom", null);
+
 var _default = Button;
 exports.default = _default;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","../MaterialComponent":"..\\node_modules\\preact-material-components\\MaterialComponent.js","../Icon/":"..\\node_modules\\preact-material-components\\Icon\\index.js","../themeUtils/generateThemeClass":"..\\node_modules\\preact-material-components\\themeUtils\\generateThemeClass.js"}],"..\\node_modules\\preact-material-components\\Button\\style.css":[function(require,module,exports) {
+//# sourceMappingURL=index.js.map
+},{"@babel/runtime/helpers/interopRequireDefault":"..\\node_modules\\@babel\\runtime\\helpers\\interopRequireDefault.js","@babel/runtime/helpers/createClass":"..\\node_modules\\@babel\\runtime\\helpers\\createClass.js","@babel/runtime/helpers/classCallCheck":"..\\node_modules\\@babel\\runtime\\helpers\\classCallCheck.js","@babel/runtime/helpers/possibleConstructorReturn":"..\\node_modules\\@babel\\runtime\\helpers\\possibleConstructorReturn.js","@babel/runtime/helpers/getPrototypeOf":"..\\node_modules\\@babel\\runtime\\helpers\\getPrototypeOf.js","@babel/runtime/helpers/inherits":"..\\node_modules\\@babel\\runtime\\helpers\\inherits.js","@babel/runtime/helpers/typeof":"..\\node_modules\\@babel\\runtime\\helpers\\typeof.js","autobind-decorator":"..\\node_modules\\autobind-decorator\\lib\\index.js","preact":"..\\node_modules\\preact\\dist\\preact.mjs","../Base/MaterialComponent":"..\\node_modules\\preact-material-components\\Base\\MaterialComponent.js","../Icon":"..\\node_modules\\preact-material-components\\Icon\\index.js","../themeUtils/generateThemeClass":"..\\node_modules\\preact-material-components\\themeUtils\\generateThemeClass.js"}],"..\\node_modules\\preact-material-components\\Button\\style.css":[function(require,module,exports) {
 
         var reloadCSS = require('_css_loader');
         module.hot.dispose(reloadCSS);
@@ -20600,6 +20956,7 @@ var global = arguments[3];
 })));
 
 },{}],"style.css":[function(require,module,exports) {
+'use strict';
 
 var reloadCSS = require('_css_loader');
 module.hot.dispose(reloadCSS);
@@ -20730,7 +21087,7 @@ var MessageViewer = function (_Component) {
 }(_preact.Component);
 
 exports.default = MessageViewer;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","moment":"..\\node_modules\\moment\\moment.js","./../style.css":"style.css"}],"components\\sidebar.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.mjs","moment":"..\\node_modules\\moment\\moment.js","./../style.css":"style.css"}],"components\\sidebar.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20794,7 +21151,7 @@ var Sidebar = function (_Component) {
 }(_preact.Component);
 
 exports.default = Sidebar;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","./../style.css":"style.css"}],"chat.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.mjs","./../style.css":"style.css"}],"chat.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20963,6 +21320,7 @@ var Chat = function (_Component) {
     }, {
         key: 'render',
         value: function render(props, state) {
+            console.log('test:', props, state);
             return (0, _preact.h)(
                 'div',
                 { 'class': 'displayFlex flexRow chatComponentContainer' },
@@ -21013,7 +21371,7 @@ var Chat = function (_Component) {
 }(_preact.Component);
 
 exports.default = Chat;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","./components/messageViewer":"components\\messageViewer.js","./components/sidebar":"components\\sidebar.js","./style.css":"style.css"}],"login.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.mjs","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","./components/messageViewer":"components\\messageViewer.js","./components/sidebar":"components\\sidebar.js","./style.css":"style.css"}],"login.js":[function(require,module,exports) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21150,7 +21508,7 @@ var Login = function (_Component) {
 }(_preact.Component);
 
 exports.default = Login;
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","./style.css":"style.css"}],"index.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.mjs","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","socket.io-client":"..\\node_modules\\socket.io-client\\lib\\index.js","preact-material-components/Button":"..\\node_modules\\preact-material-components\\Button\\index.js","preact-material-components/Button/style.css":"..\\node_modules\\preact-material-components\\Button\\style.css","preact-material-components/Theme/style.css":"..\\node_modules\\preact-material-components\\Theme\\style.css","preact-material-components/TextField":"..\\node_modules\\preact-material-components\\TextField\\index.js","preact-material-components/TextField/style.css":"..\\node_modules\\preact-material-components\\TextField\\style.css","preact-material-components/FormField":"..\\node_modules\\preact-material-components\\FormField\\index.js","preact-material-components/Radio/style.css":"..\\node_modules\\preact-material-components\\Radio\\style.css","preact-material-components/FormField/style.css":"..\\node_modules\\preact-material-components\\FormField\\style.css","./style.css":"style.css"}],"index.js":[function(require,module,exports) {
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -21204,7 +21562,7 @@ var Index = function (_Component) {
 }(_preact.Component);
 
 (0, _preact.render)((0, _preact.h)(Index, null), document.body);
-},{"preact":"..\\node_modules\\preact\\dist\\preact.esm.js","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","history":"..\\node_modules\\history\\es\\index.js","./chat":"chat.js","./login":"login.js","./style.css":"style.css"}],"..\\node_modules\\parcel-bundler\\src\\builtins\\hmr-runtime.js":[function(require,module,exports) {
+},{"preact":"..\\node_modules\\preact\\dist\\preact.mjs","preact-router":"..\\node_modules\\preact-router\\dist\\preact-router.es.js","history":"..\\node_modules\\history\\es\\index.js","./chat":"chat.js","./login":"login.js","./style.css":"style.css"}],"..\\node_modules\\parcel-bundler\\src\\builtins\\hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 
@@ -21231,9 +21589,9 @@ module.bundle.Module = Module;
 
 var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
-  var hostname = '' || location.hostname;
+  var hostname = undefined || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + '55636' + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + '62617' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
