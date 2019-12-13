@@ -49,8 +49,8 @@
         "express": "^4.16.3",
         "history": "^4.7.2",
         "moment": "^2.22.2",
-        "mongodb": "^3.1.1",
-        "parcel-bundler": "^1.12.3",
+        "mongodb": "^3.4.0",
+        "parcel-bundler": "^1.12.4",
         "preact": "^8.2.9",
         "preact-material-components": "^1.5.0",
         "preact-router": "^2.6.1",
@@ -59,7 +59,7 @@
         "socket.io-client": "^2.1.1"
     },
     "devDependencies": {
-        "expect": "^23.4.0",
+        "expect": "^25.0.0",
         "mocha": "^5.2.0"
     }
 }
