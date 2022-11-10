@@ -55,8 +55,8 @@
         "preact-material-components": "^1.5.0",
         "preact-router": "^2.6.1",
         "prettier": "^1.13.7",
-        "socket.io": "^2.1.1",
-        "socket.io-client": "^2.1.1"
+        "socket.io": "^2.5.0",
+        "socket.io-client": "^2.5.0"
     },
     "devDependencies": {
         "expect": "^25.0.0",
